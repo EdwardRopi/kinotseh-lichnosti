@@ -1,0 +1,10 @@
+services:
+  - type: web
+    runtime: static
+    name: kinotseh-lichnosti
+    # Статический сайт без сборки — публикуется корень репозитория.
+    # Важно: именно "./", а не "." — с "." Render рапортует об успешном
+    # деплое, но заливает пустой каталог и сайт отдаёт 404 на все пути.
+    buildCommand: ""
+    staticPublishPath: ./
+    pullRequestPreviewsEnabled: false

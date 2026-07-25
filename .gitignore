@@ -1,0 +1,7 @@
+# Копия оригинального сайта — только для сравнения, не публикуется
+_original-reference/
+
+node_modules/
+.DS_Store
+Thumbs.db
+*.log

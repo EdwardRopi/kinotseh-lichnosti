@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Киноцех личности — детская школа кино в Краснодаре. Лаборатория развития ребенка через кино: актерское мастерство, режиссура, подкасты. Дети 8–17 лет.">
+    <meta name="theme-color" content="#070912">
+    <title>Киноцех личности — Детская школа кино</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Кинозернистость поверх всей страницы -->
+    <div class="grain" aria-hidden="true"></div>
+    <!-- Неоновое пятно, следующее за курсором -->
+    <div class="cursor-glow" aria-hidden="true"></div>
+    <!-- Полоса прогресса прокрутки -->
+    <div class="scroll-progress" aria-hidden="true"><span></span></div>
+
+    <!-- Шапка сайта -->
+    <header class="header" id="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="#home" class="logo">
+                    <span class="logo-mark" aria-hidden="true">
+                        <i class="fas fa-clapperboard"></i>
+                    </span>
+                    <span class="logo-text">
+                        <span class="logo-title">Киноцех <em>личности</em></span>
+                        <span class="tagline">Лаборатория развития ребенка через кино</span>
+                    </span>
+                </a>
+
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#home" class="nav-link">Главная</a></li>
+                    <li><a href="#about" class="nav-link">О нас</a></li>
+                    <li><a href="#directions" class="nav-link">Направления</a></li>
+                    <li><a href="#mentors" class="nav-link">Наставники</a></li>
+                    <li><a href="#contacts" class="nav-link">Контакты</a></li>
+                    <li class="nav-cta"><a href="#application" class="btn-apply">Подать заявку</a></li>
+                </ul>
+
+                <button class="hamburger" id="hamburger" aria-label="Открыть меню" aria-expanded="false" aria-controls="navMenu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Главный баннер -->
+        <section id="home" class="hero">
+            <div class="hero-bg" aria-hidden="true">
+                <span class="orb orb-1" data-parallax="0.16"></span>
+                <span class="orb orb-2" data-parallax="-0.10"></span>
+                <span class="orb orb-3" data-parallax="0.07"></span>
+                <span class="hero-grid"></span>
+                <span class="hero-scan"></span>
+            </div>
+
+            <div class="container">
+                <div class="hero-content">
+                    <p class="eyebrow reveal">
+                        <span class="rec-dot" aria-hidden="true"></span>
+                        Детская школа кино · Краснодар
+                    </p>
+
+                    <div class="hero-tagline reveal" data-delay="1">
+                        <h1>Киноцех личности. <span class="grad-text">Пространство проявленности</span> и визуальной свободы</h1>
+                    </div>
+
+                    <h2 class="reveal" data-delay="2">Развиваем личность ребенка через искусство кино</h2>
+
+                    <div class="hero-actions reveal" data-delay="3">
+                        <a href="#application" class="btn-primary magnetic">
+                            <span>Записаться на пробное занятие</span>
+                            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                        </a>
+                        <a href="#directions" class="btn-ghost magnetic">
+                            <i class="fas fa-play" aria-hidden="true"></i>
+                            <span>Смотреть направления</span>
+                        </a>
+                    </div>
+
+                    <ul class="hero-stats reveal" data-delay="4">
+                        <li>
+                            <strong class="counter" data-count="3">0</strong>
+                            <span>пакетных направления</span>
+                        </li>
+                        <li>
+                            <strong class="counter" data-count="5">0</strong>
+                            <span>программ на выбор</span>
+                        </li>
+                        <li>
+                            <strong><span class="counter" data-count="8">0</span>–<span class="counter" data-count="17">0</span></strong>
+                            <span>лет — возраст учеников</span>
+                        </li>
+                        <li>
+                            <strong class="counter" data-count="3">0</strong>
+                            <span>наставника из большого кино</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <a href="#about" class="scroll-cue" aria-label="Пролистать вниз">
+                <span class="scroll-cue-line" aria-hidden="true"></span>
+                <span class="scroll-cue-text">Листайте</span>
+            </a>
+        </section>
+
+        <!-- Бегущая строка -->
+        <div class="marquee" aria-hidden="true">
+            <div class="marquee-track">
+                <span class="marquee-group">
+                    <b>Актер</b><i>✦</i><b>Режиссер</b><i>✦</i><b>Подкаст</b><i>✦</i><b>Крупный план</b><i>✦</i>
+                    <b>Авторский взгляд</b><i>✦</i><b>Эмоциональный интеллект</b><i>✦</i><b>Монтаж</b><i>✦</i>
+                    <b>Портфолио</b><i>✦</i><b>Киноязык</b><i>✦</i><b>Моноспектакль</b><i>✦</i>
+                </span>
+                <span class="marquee-group">
+                    <b>Актер</b><i>✦</i><b>Режиссер</b><i>✦</i><b>Подкаст</b><i>✦</i><b>Крупный план</b><i>✦</i>
+                    <b>Авторский взгляд</b><i>✦</i><b>Эмоциональный интеллект</b><i>✦</i><b>Монтаж</b><i>✦</i>
+                    <b>Портфолио</b><i>✦</i><b>Киноязык</b><i>✦</i><b>Моноспектакль</b><i>✦</i>
+                </span>
+            </div>
+        </div>
+
+        <!-- Раздел "О нас" -->
+        <section id="about" class="section about">
+            <div class="container">
+                <h2 class="section-title reveal"><span class="section-index">01</span> О нас</h2>
+
+                <div class="about-content">
+                    <div class="about-text reveal" data-delay="1">
+                        <h3>Киноцех личности — это творческая лаборатория профессионалов в сфере кино</h3>
+                        <p>Мы не просто говорим как играть или снимать — мы помогаем ребенку стать автором и режиссером своей реальности. Наша лаборатория принципиально отличается от классической театральной студии.</p>
+                        <a href="#directions" class="link-arrow">
+                            <span>Посмотреть программы</span>
+                            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                        </a>
+                    </div>
+
+                    <div class="about-features">
+                        <ul class="features">
+                            <li class="reveal spotlight" data-delay="1">
+                                <span class="feature-icon" aria-hidden="true"><i class="fas fa-check-circle"></i></span>
+                                <div>
+                                    <h4>Естественность вместо условности</h4>
+                                    <p>Мы уходим от «сценической» громкой речи к жизненной правде и тонким интонациям.</p>
+                                </div>
+                            </li>
+                            <li class="reveal spotlight" data-delay="2">
+                                <span class="feature-icon" aria-hidden="true"><i class="fas fa-check-circle"></i></span>
+                                <div>
+                                    <h4>Фокус на камеру</h4>
+                                    <p>Главное — работа перед объективом и понимание того, что такое «крупный план».</p>
+                                </div>
+                            </li>
+                            <li class="reveal spotlight" data-delay="3">
+                                <span class="feature-icon" aria-hidden="true"><i class="fas fa-check-circle"></i></span>
+                                <div>
+                                    <h4>Результат, который можно увидеть</h4>
+                                    <p>Каждый курс заканчивается созданием реального продукта (фильма, блога или подкаста), который формирует портфолио ребенка.</p>
+                                </div>
+                            </li>
+                            <li class="reveal spotlight" data-delay="4">
+                                <span class="feature-icon" aria-hidden="true"><i class="fas fa-check-circle"></i></span>
+                                <div>
+                                    <h4>Становление личности</h4>
+                                    <p>Мы развиваем необходимые для жизни навыки: вкус, эмоциональный интеллект и внутренний стержень.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Раздел "Направления" -->
+        <section id="directions" class="section directions">
+            <div class="container">
+                <h2 class="section-title reveal"><span class="section-index">02</span> Пакетные предложения</h2>
+                <p class="section-lead reveal" data-delay="1">Выберите возраст и направление — кликните по программе, и она подставится в форму заявки.</p>
+
+                <div class="directions-grid">
+                    <!-- АКТЕР -->
+                    <article class="direction-card reveal spotlight beam" data-delay="1">
+                        <div class="direction-head">
+                            <div class="direction-icon"><i class="fas fa-theater-masks" aria-hidden="true"></i></div>
+                            <h3>АКТЕР: СУТЬ</h3>
+                        </div>
+                        <p class="direction-description">Развитие эмоционального интеллекта через актерское мастерство. Профориентация и формирование авторского взгляда.</p>
+
+                        <div class="age-groups">
+                            <button type="button" class="age-group" data-program="actor-base">
+                                <div class="age-header">
+                                    <h4><i class="fas fa-child" aria-hidden="true"></i> 8–12 лет <span class="age-badge">База</span></h4>
+                                    <div class="duration"><i class="far fa-clock" aria-hidden="true"></i> 2 месяца</div>
+                                </div>
+                                <p class="age-description">Развитие эмоционального интеллекта. Итог — Проф ориентация и авторский взгляд.</p>
+                                <div class="age-details">
+                                    <span class="detail-item"><i class="fas fa-users" aria-hidden="true"></i> Группы 8–12 чел.</span>
+                                    <span class="detail-item price"><i class="fas fa-ruble-sign" aria-hidden="true"></i> 10 000 руб/мес</span>
+                                </div>
+                                <span class="age-pick">Выбрать <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                            </button>
+
+                            <div class="age-divider" aria-hidden="true"></div>
+
+                            <button type="button" class="age-group" data-program="actor-pro">
+                                <div class="age-header">
+                                    <h4><i class="fas fa-user-graduate" aria-hidden="true"></i> 13–17 лет <span class="age-badge pro">Про</span></h4>
+                                    <div class="duration"><i class="far fa-clock" aria-hidden="true"></i> 5 месяцев</div>
+                                </div>
+                                <p class="age-description">Развитие эмоционального интеллекта. Итог — Профориентация и авторский взгляд. Итог — моноспектакль.</p>
+                                <div class="age-details">
+                                    <span class="detail-item"><i class="fas fa-users" aria-hidden="true"></i> Группы 8–10 чел.</span>
+                                    <span class="detail-item price"><i class="fas fa-ruble-sign" aria-hidden="true"></i> 14 000 руб/мес</span>
+                                </div>
+                                <span class="age-pick">Выбрать <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                            </button>
+                        </div>
+                    </article>
+
+                    <!-- РЕЖИССЕР -->
+                    <article class="direction-card reveal spotlight beam" data-delay="2">
+                        <div class="direction-head">
+                            <div class="direction-icon"><i class="fas fa-video" aria-hidden="true"></i></div>
+                            <h3>РЕЖИССЕР: СМЫСЛЫ</h3>
+                        </div>
+                        <p class="direction-description">Создание авторского кино от идеи до реализации. Развитие визуального мышления и режиссерских навыков.</p>
+
+                        <div class="age-groups">
+                            <button type="button" class="age-group" data-program="director-base">
+                                <div class="age-header">
+                                    <h4><i class="fas fa-child" aria-hidden="true"></i> 8–12 лет <span class="age-badge">База</span></h4>
+                                    <div class="duration"><i class="far fa-clock" aria-hidden="true"></i> 4 месяца</div>
+                                </div>
+                                <p class="age-description">Киноязык и блогерство через игру. Режиссеры снимают наших актёров.</p>
+                                <div class="age-details">
+                                    <span class="detail-item price"><i class="fas fa-ruble-sign" aria-hidden="true"></i> 11 000 руб/мес</span>
+                                </div>
+                                <span class="age-pick">Выбрать <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                            </button>
+
+                            <div class="age-divider" aria-hidden="true"></div>
+
+                            <button type="button" class="age-group" data-program="director-pro">
+                                <div class="age-header">
+                                    <h4><i class="fas fa-user-graduate" aria-hidden="true"></i> 13–17 лет <span class="age-badge pro">Про</span></h4>
+                                    <div class="duration"><i class="far fa-clock" aria-hidden="true"></i> 6 месяцев</div>
+                                </div>
+                                <p class="age-description">Сложные навыки и монтаж. Подготовка портфолио для вуза или карьеры.</p>
+                                <div class="age-details">
+                                    <span class="detail-item price"><i class="fas fa-ruble-sign" aria-hidden="true"></i> 12 000 руб/мес</span>
+                                </div>
+                                <span class="age-pick">Выбрать <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                            </button>
+                        </div>
+                    </article>
+
+                    <!-- ПОДКАСТ -->
+                    <article class="direction-card reveal spotlight beam" data-delay="3">
+                        <div class="direction-head">
+                            <div class="direction-icon"><i class="fas fa-podcast" aria-hidden="true"></i></div>
+                            <h3>ПОДКАСТ: ГОЛОС И ВЛИЯНИЕ</h3>
+                        </div>
+                        <p class="direction-description">Освоение полного цикла создания подкастов. Развитие уверенной речи и цифровой грамотности.</p>
+
+                        <div class="age-groups single-age">
+                            <button type="button" class="age-group" data-program="podcast">
+                                <div class="age-header">
+                                    <h4><i class="fas fa-users" aria-hidden="true"></i> 8–15 лет</h4>
+                                    <div class="duration"><i class="far fa-calendar-alt" aria-hidden="true"></i> Полный курс</div>
+                                </div>
+                                <p class="age-description">Освоение полного цикла: от идеи до публикации. Развитие уверенной речи и цифровой грамотности.</p>
+                                <div class="age-details">
+                                    <span class="detail-item price highlighted"><i class="fas fa-ruble-sign" aria-hidden="true"></i> 7 000 руб/мес <small>(14 000 за курс)</small></span>
+                                </div>
+                                <span class="age-pick">Выбрать <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                            </button>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Раздел "Наставники" -->
+        <section id="mentors" class="section mentors">
+            <div class="container">
+                <h2 class="section-title reveal"><span class="section-index">03</span> Наши наставники</h2>
+
+                <div class="mentors-grid">
+                    <article class="mentor-card reveal spotlight" data-delay="1">
+                        <div class="mentor-image">
+                            <img src="img/mentor-moguchev.png" alt="Дмитрий Могучев" class="mentor-photo" loading="lazy" width="371" height="371">
+                            <span class="mentor-frame" aria-hidden="true"></span>
+                        </div>
+                        <h3>Дмитрий Могучев</h3>
+                        <p class="mentor-role">Режиссер-постановщик, сценарист, актер</p>
+
+                        <div class="mentor-education accordion">
+                            <button type="button" class="acc-trigger" aria-expanded="false">
+                                <span><strong>Образование</strong></span>
+                                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                            </button>
+                            <div class="acc-panel">
+                                <div class="acc-inner">
+                                    <ul>
+                                        <li><strong>Петрозаводская Государственная Консерватория.</strong><br>
+                                            Специальность: «Актер театра и кино».<br>
+                                            (Мастерская А. М. Зеланда и Ю. М. Цуркану, 2006)</li>
+                                        <li><strong>«Метод Михаила Чехова в практике современного режиссера»</strong><br>
+                                            (РГИСИ, повышение квалификации, 2015)</li>
+                                        <li><strong>Киноакадемия Н.С. Михалкова.</strong><br>
+                                            Специальность: Режиссер-постановщик.<br>
+                                            (Мастерская В.И. Хотиненко и В.А. Фенченко, 2020)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="mentor-card reveal spotlight" data-delay="2">
+                        <div class="mentor-image">
+                            <img src="img/mentor-skorobogatov.png" alt="Павел Скоробогатов" class="mentor-photo" loading="lazy" width="371" height="371">
+                            <span class="mentor-frame" aria-hidden="true"></span>
+                        </div>
+                        <h3>Павел Скоробогатов</h3>
+                        <p class="mentor-role">Режиссер-постановщик, сценарист, продюсер. Генеральный директор ООО «Продюсерский центр Павла Скоробогатов»</p>
+
+                        <div class="mentor-education accordion">
+                            <button type="button" class="acc-trigger" aria-expanded="false">
+                                <span><strong>Образование и регалии</strong></span>
+                                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                            </button>
+                            <div class="acc-panel">
+                                <div class="acc-inner">
+                                    <ul>
+                                        <li><strong>2019 – 2020 Академия кинематографического и театрального искусства Н.С. Михалкова.</strong><br>
+                                            Продюсерская мастерская Л.Э. Верещагина. Специальность: продюсирование кино</li>
+                                        <li><strong>2015 – 2017 Высшие курсы сценаристов и режиссеров.</strong><br>
+                                            Мастерская В.И. Хотиненко, П.К. Финна, В.А. Фенченко. Специальность: режиссура игрового фильма</li>
+                                        <li><strong>1999 – 2004 Иркутский Государственный Университет. Физический факультет.</strong><br>
+                                            Специальность: радиофизика и электроника</li>
+                                    </ul>
+                                    <p class="acc-subtitle"><strong>Дополнительная информация:</strong></p>
+                                    <ul class="acc-tags">
+                                        <li>Член Союза кинематографистов РФ</li>
+                                        <li>Член Русского географического общества</li>
+                                        <li>Руководитель кинокомпании «Джей Медиа» и «Продюсерского центра Павла Скоробогатов»</li>
+                                        <li>Лауреат кинопремии им. Леонида Гайдая Союза кинематографистов России, 2023 г.</li>
+                                        <li>Лауреат премии Губернатора Иркутской области, 2024 г.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="mentor-card reveal spotlight" data-delay="3">
+                        <div class="mentor-image">
+                            <img src="img/mentor-plohotnikov.png" alt="Константин Плохотников" class="mentor-photo" loading="lazy" width="371" height="371">
+                            <span class="mentor-frame" aria-hidden="true"></span>
+                        </div>
+                        <h3>Константин Плохотников</h3>
+                        <p class="mentor-role">Продюсер, режиссёр, руководитель федеральных кинопроектов «Наследник», «Обратная сторона»</p>
+
+                        <div class="mentor-education accordion">
+                            <button type="button" class="acc-trigger" aria-expanded="false">
+                                <span><strong>Образование</strong></span>
+                                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                            </button>
+                            <div class="acc-panel">
+                                <div class="acc-inner">
+                                    <ul>
+                                        <li><strong>ВГИК высшие курсы, второй режиссер.</strong><br>
+                                            (Мастерская А.И. Богун, 2020)</li>
+                                        <li><strong>Академия кинематографического и театрального искусства Н.С. Михалкова.</strong><br>
+                                            Продюсерская мастерская Л.Э. Верещагина. Специальность: продюсирование кино</li>
+                                        <li><strong>Работа в Академии ФК Краснодар, преподаватель направления создания видеоконтента</strong></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Форма заявки -->
+        <section id="application" class="section application">
+            <div class="container">
+                <div class="application-wrapper reveal">
+                    <div class="application-info">
+                        <h2><span class="section-index">04</span> Записаться на занятие</h2>
+                        <p>Оставьте заявку, и мы свяжемся с вами в течение дня для уточнения деталей и подбора подходящей программы для вашего ребенка.</p>
+                        <div class="contact-info">
+                            <a href="tel:+79181205573"><i class="fas fa-phone" aria-hidden="true"></i> <span>+7 (918) 120-55-73</span></a>
+                            <a href="mailto:info@kinoceh.ru"><i class="fas fa-envelope" aria-hidden="true"></i> <span>info@kinoceh.ru</span></a>
+                            <p><i class="fas fa-map-marker-alt" aria-hidden="true"></i> <span>г. Краснодар, ул. Северная, 405</span></p>
+                        </div>
+                    </div>
+
+                    <div class="application-form">
+                        <form id="contactForm" novalidate>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <input type="text" id="name" name="name" placeholder=" " required>
+                                    <label for="name">Ваше имя</label>
+                                </div>
+                                <div class="form-group">
+                                    <input type="tel" id="phone" name="phone" placeholder=" " required>
+                                    <label for="phone">Телефон</label>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <input type="email" id="email" name="email" placeholder=" " required>
+                                    <label for="email">Email</label>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="childAge" name="childAge" placeholder=" " required inputmode="numeric">
+                                    <label for="childAge">Возраст ребенка</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <select id="program" name="program" class="form-select" required>
+                                    <option value="">Выберите программу</option>
+                                    <option value="actor-base">Актер: суть (8-12 лет, База)</option>
+                                    <option value="actor-pro">Актер: суть (13-17 лет, Про)</option>
+                                    <option value="director-base">Режиссер: смыслы (8-12 лет, База)</option>
+                                    <option value="director-pro">Режиссер: смыслы (13-17 лет, Про)</option>
+                                    <option value="podcast">Подкаст: голос и влияние (8-15 лет)</option>
+                                </select>
+                                <i class="fas fa-chevron-down select-arrow" aria-hidden="true"></i>
+                            </div>
+                            <div class="form-group">
+                                <textarea id="message" name="message" placeholder=" " rows="3"></textarea>
+                                <label for="message">Дополнительная информация (интересы ребенка, пожелания)</label>
+                            </div>
+                            <div class="form-group checkbox-group">
+                                <input type="checkbox" id="privacyPolicy" name="privacyPolicy" required>
+                                <label for="privacyPolicy">
+                                    Я согласен(на) на обработку моих персональных данных в соответствии с
+                                    <a href="#" class="privacy-link">Политикой конфиденциальности</a>
+                                </label>
+                            </div>
+                            <button type="submit" class="btn-primary btn-block magnetic">
+                                <span>Записаться на мастер класс</span>
+                                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                            </button>
+                        </form>
+                        <div id="formMessage" class="form-message" role="status" aria-live="polite"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Раздел "Контакты" -->
+        <section id="contacts" class="section contacts">
+            <div class="container">
+                <h2 class="section-title reveal"><span class="section-index">05</span> Контакты</h2>
+
+                <div class="contacts-content">
+                    <div class="contact-card reveal spotlight" data-delay="1">
+                        <h3>Как нас найти</h3>
+                        <ul class="contact-list">
+                            <li>
+                                <span class="ci" aria-hidden="true"><i class="fas fa-map-marker-alt"></i></span>
+                                <div><strong>Адрес</strong><p>г. Краснодар, ул. Северная, 405</p></div>
+                            </li>
+                            <li>
+                                <span class="ci" aria-hidden="true"><i class="fas fa-clock"></i></span>
+                                <div><strong>Часы работы</strong><p>Пн-Пт: 10:00-20:00, Сб-Вс: 10:00-18:00</p></div>
+                            </li>
+                            <li>
+                                <span class="ci" aria-hidden="true"><i class="fas fa-phone"></i></span>
+                                <div><strong>Телефон</strong><p><a href="tel:+79181205573">+7 (918) 120-55-73</a></p></div>
+                            </li>
+                            <li>
+                                <span class="ci" aria-hidden="true"><i class="fas fa-envelope"></i></span>
+                                <div><strong>Email</strong><p><a href="mailto:info@kinoceh.ru">info@kinoceh.ru</a></p></div>
+                            </li>
+                        </ul>
+                        <div class="social-links">
+                            <a href="#" aria-label="ВКонтакте"><i class="fab fa-vk" aria-hidden="true"></i></a>
+                            <a href="#" aria-label="Telegram"><i class="fab fa-telegram" aria-hidden="true"></i></a>
+                            <a href="#" aria-label="YouTube"><i class="fab fa-youtube" aria-hidden="true"></i></a>
+                            <a href="#" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="map-placeholder reveal" data-delay="2">
+                        <div class="yandex-map-container">
+                            <iframe
+                                src="https://yandex.ru/map-widget/v1/?ll=38.995723%2C45.037458&z=16&pt=38.995723%2C45.037458%2Cpm2orgl&l=map"
+                                width="100%"
+                                height="400"
+                                frameborder="0"
+                                allowfullscreen="true"
+                                loading="lazy"
+                                title="Карта проезда к Киноцех личности">
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Футер -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h3>Киноцех <span>личности</span></h3>
+                    <p>Лаборатория развития ребенка через кино</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Быстрые ссылки</h4>
+                    <ul>
+                        <li><a href="#about">О нас</a></li>
+                        <li><a href="#directions">Направления</a></li>
+                        <li><a href="#mentors">Наставники</a></li>
+                        <li><a href="#contacts">Контакты</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>Свяжитесь с нами</h4>
+                    <p><i class="fas fa-phone" aria-hidden="true"></i> <a href="tel:+79181205573">+7 (918) 120-55-73</a></p>
+                    <p><i class="fas fa-envelope" aria-hidden="true"></i> <a href="mailto:info@kinoceh.ru">info@kinoceh.ru</a></p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Киноцех личности. Все права защищены.</p>
+                <p>Дизайнер и разработчик: Эдуард Плохотников</p>
+            </div>
+        </div>
+    </footer>
+
+    <a href="#home" class="to-top" id="toTop" aria-label="Наверх"><i class="fas fa-arrow-up" aria-hidden="true"></i></a>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
