@@ -116,6 +116,8 @@ button { font: inherit; color: inherit; }
     background-image: radial-gradient(circle at 50% 50%, var(--gate) 0 4.5px, transparent 5px);
     background-size: 32px 26px;
     background-repeat: repeat-x;
+    /* Плёнка идёт через кадровое окно по мере прокрутки — сдвиг задаёт скрипт */
+    background-position: var(--film, 0px) 0;
     border-top: 1px solid var(--rail);
     border-bottom: 1px solid var(--rail);
 }
@@ -254,7 +256,10 @@ button { font: inherit; color: inherit; }
     margin-right: 12px;
     vertical-align: middle;
     background: var(--lime);
+    transition: width 0.6s var(--ease) 0.15s;
 }
+/* Линейка прочерчивается, когда подпись появляется в кадре */
+.kicker.reveal:not(.in)::before { width: 0; }
 
 .hero-title {
     font-size: clamp(1.9rem, 4.3vw, 3.5rem);
@@ -336,6 +341,7 @@ button { font: inherit; color: inherit; }
     font-weight: 700;
     letter-spacing: -0.03em;
     margin-bottom: 20px;
+    padding-bottom: 0.14em; /* запас, чтобы вытирание не срезало выносные элементы */
 }
 .band-lead {
     max-width: 560px;
@@ -380,9 +386,14 @@ button { font: inherit; color: inherit; }
     background: var(--bench);
     border: 1px solid var(--rail);
     clip-path: polygon(0 0, calc(100% - var(--notch)) 0, 100% var(--notch), 100% 100%, 0 100%);
-    transition: background var(--t), border-color var(--t);
+    transition: background var(--t), border-color var(--t), clip-path 0.45s var(--ease);
 }
-.gate:hover { background: var(--panel); border-color: var(--rail-2); }
+/* Срез угла приоткрывается — как диафрагма */
+.gate:hover {
+    background: var(--panel);
+    border-color: var(--rail-2);
+    clip-path: polygon(0 0, calc(100% - var(--notch) - 16px) 0, 100% calc(var(--notch) + 16px), 100% 100%, 0 100%);
+}
 
 .gate h4 {
     font-size: 0.98rem;
@@ -402,15 +413,27 @@ button { font: inherit; color: inherit; }
 }
 
 .prog {
+    position: relative;
     display: flex;
     flex-direction: column;
     padding: 30px 26px;
     background: var(--bench);
     border: 1px solid var(--rail);
     clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 0 100%);
-    transition: border-color var(--t);
+    transition: border-color var(--t), transform var(--t);
 }
-.prog:hover { border-color: var(--rail-2); }
+.prog:hover { border-color: var(--rail-2); transform: translateY(-5px); }
+
+/* Световая линия проходит по верхней кромке и обрывается на срезе угла */
+.prog::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 0; height: 2px;
+    background: var(--lime);
+    transition: width 0.55s var(--ease);
+}
+.prog:hover::before { width: 100%; }
 
 .prog-head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
 
@@ -434,67 +457,132 @@ button { font: inherit; color: inherit; }
 
 .prog-desc { font-size: 0.9rem; color: var(--dim); margin-bottom: 24px; }
 
-.tiers { display: grid; gap: 12px; margin-top: auto; }
+/* --- Переключатель возраста: один на весь блок, вместо повтора в каждой карточке --- */
 
-/* Уровень программы = кнопка выбора */
-.tier {
+.switch {
+    position: relative;
     display: grid;
-    gap: 8px;
+    grid-template-columns: 1fr 1fr;
+    width: max-content;
+    max-width: 100%;
+    margin-bottom: 36px;
+    background: var(--bench);
+    border: 1px solid var(--rail-2);
+}
+
+.sw {
+    position: relative;
+    z-index: 1;
+    padding: 14px 26px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 0.79rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    color: var(--dim);
+    transition: color 0.3s var(--ease);
+}
+.sw span {
+    margin-left: 8px;
+    font-size: 0.61rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+.sw[aria-pressed="true"] { color: var(--gate); }
+
+/* Подложка едет за выбором и меняет цвет: лайм = База, глина = Про */
+.sw-ind {
+    position: absolute;
+    z-index: 0;
+    top: 0; bottom: 0; left: 0;
+    width: 50%;
+    background: var(--lime);
+    transition: transform 0.45s var(--ease), background 0.45s var(--ease);
+}
+.switch[data-active="pro"] .sw-ind {
+    transform: translateX(100%);
+    background: var(--clay);
+}
+
+/* --- Уровни: видно один, второй ждёт своей очереди в том же месте сетки --- */
+
+.tiers { display: grid; margin-top: auto; }
+
+.tier {
+    grid-area: 1 / 1;
+    display: grid;
+    gap: 11px;
+    align-content: start;
     width: 100%;
-    padding: 18px;
+    padding: 22px 20px;
     text-align: left;
     background: var(--panel);
     border: 1px solid var(--rail);
     border-left: 2px solid var(--rail-2);
     cursor: pointer;
-    transition: border-left-color var(--t), background var(--t), transform var(--t);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity 0.4s var(--ease), transform 0.4s var(--ease),
+                visibility 0.4s var(--ease), background var(--t), border-left-color var(--t);
 }
-.tier:hover { background: #202818; border-left-color: var(--lime); transform: translateX(3px); }
-.tier.picked { border-left-color: var(--lime); background: #232C1A; }
+.tier.show { opacity: 1; visibility: visible; transform: none; }
+.tier:hover { background: #202818; border-left-color: var(--lime); }
+.tier.picked { background: #232C1A; border-left-color: var(--lime); }
 
-.tier-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-
-.tier-age {
-    font-family: var(--display);
-    font-size: 0.98rem;
-    font-weight: 600;
-    color: var(--ink);
-}
-
-.badge {
+/* Цена — главный акцент карточки */
+.tier-price {
     font-family: var(--mono);
-    font-size: 0.62rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    padding: 4px 9px;
-    color: var(--gate);
-    background: var(--sand);
+    line-height: 1;
+    letter-spacing: -0.025em;
+    color: var(--lime);
 }
-.badge-pro { background: var(--clay); }
+.tier-price i {
+    display: block;
+    margin-top: 7px;
+    font-style: normal;
+    font-size: 0.71rem;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    color: var(--faint);
+}
 
 .tier-meta {
     font-family: var(--mono);
     font-size: 0.71rem;
     letter-spacing: 0.05em;
-    color: var(--faint);
+    color: var(--sand);
 }
 .tier-desc { font-size: 0.85rem; color: var(--dim); }
 
-.tier-price {
+.tier-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
     font-family: var(--mono);
-    font-size: 1.02rem;
+    font-size: 0.71rem;
     font-weight: 700;
-    color: var(--lime);
-    margin-top: 4px;
-}
-.tier-price i {
-    font-style: normal;
-    font-size: 0.7rem;
-    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     color: var(--faint);
-    margin-left: 4px;
+    transition: color var(--t);
 }
+.tier-go::after {
+    content: '→';
+    transition: transform var(--t);
+}
+.tier:hover .tier-go { color: var(--lime); }
+.tier:hover .tier-go::after { transform: translateX(5px); }
+.tier.picked .tier-go { color: var(--lime); }
+.tier.picked .tier-go::after { content: '✓'; transform: none; }
 
 /* ======================== НАСТАВНИКИ ======================== */
 
@@ -526,10 +614,15 @@ button { font: inherit; color: inherit; }
     width: 100%; height: 100%;
     object-fit: cover;
     object-position: 50% 30%;
-    filter: grayscale(1) contrast(1.06) brightness(0.86);
-    transition: filter 0.55s var(--ease), transform 0.65s var(--ease);
+    /* Наводка на резкость: кадр «доводится» при наведении */
+    filter: grayscale(1) blur(1.1px) contrast(1.06) brightness(0.84);
+    transform: scale(1.03);
+    transition: filter 0.6s var(--ease), transform 0.7s var(--ease);
 }
-.member:hover .frame img { filter: grayscale(0.15) brightness(1); transform: scale(1.04); }
+.member:hover .frame img {
+    filter: grayscale(0.12) blur(0) contrast(1.02) brightness(1);
+    transform: scale(1.06);
+}
 
 .member h3 { font-size: 1.16rem; font-weight: 700; margin-bottom: 7px; }
 .role { font-size: 0.85rem; color: var(--sand); line-height: 1.5; margin-bottom: 16px; }
@@ -819,6 +912,15 @@ button { font: inherit; color: inherit; }
 }
 .reveal.in { opacity: 1; transform: none; }
 
+/* Заголовки выезжают вытиранием — как титр, а не как всплывающий блок */
+.reveal.t-wipe {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 0.8s var(--ease);
+}
+.reveal.t-wipe.in { clip-path: inset(0 0 0 0); }
+
 /* Герой «включается» после хлопушки */
 .hero-copy > * {
     opacity: 0;
@@ -869,6 +971,9 @@ button { font: inherit; color: inherit; }
     .cta-sm { margin: 16px 0 0; padding: 15px 18px; }
 
     .gates { grid-template-columns: 1fr; }
+    .switch { width: 100%; }
+    .sw { padding: 14px 10px; font-size: 0.73rem; }
+    .sw span { display: block; margin: 3px 0 0; }
     .row { grid-template-columns: 1fr; gap: 0; }
     .sf-split { grid-template-columns: 1fr; gap: 14px; }
     .foot { grid-template-columns: 1fr; gap: 28px; }
@@ -901,6 +1006,9 @@ button { font: inherit; color: inherit; }
 
     .grain { display: none; }
     .reveal { opacity: 1; transform: none; }
+    .reveal.t-wipe { clip-path: none; }
+    .kicker::before { width: 22px; }
     .hero-copy > * { opacity: 1; animation: none; }
     .slate-clap { animation: none; }
+    .perf { background-position: 0 0; }
 }

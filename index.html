@@ -101,7 +101,7 @@
         <section id="about" class="band">
             <div class="wrap">
                 <p class="kicker reveal">Лаборатория</p>
-                <h2 class="band-title reveal">О нас</h2>
+                <h2 class="band-title reveal t-wipe">О нас</h2>
 
                 <div class="about">
                     <div class="about-lead reveal">
@@ -138,8 +138,18 @@
         <section id="directions" class="band">
             <div class="wrap">
                 <p class="kicker reveal">Программы</p>
-                <h2 class="band-title reveal">Пакетные предложения</h2>
-                <p class="band-lead reveal">Выберите возраст и направление — программа подставится в форму записи.</p>
+                <h2 class="band-title reveal t-wipe">Пакетные предложения</h2>
+                <p class="band-lead reveal">Выберите возраст, затем направление — программа подставится в форму записи.</p>
+
+                <div class="switch reveal" data-active="base" role="group" aria-label="Возрастная группа">
+                    <button type="button" class="sw" data-tier="base" aria-pressed="true">
+                        8–12 лет <span>База</span>
+                    </button>
+                    <button type="button" class="sw" data-tier="pro" aria-pressed="false">
+                        13–17 лет <span>Про</span>
+                    </button>
+                    <span class="sw-ind" aria-hidden="true"></span>
+                </div>
 
                 <div class="progs">
                     <!-- АКТЕР -->
@@ -151,24 +161,18 @@
                         <p class="prog-desc">Развитие эмоционального интеллекта через актерское мастерство. Профориентация и формирование авторского взгляда.</p>
 
                         <div class="tiers">
-                            <button type="button" class="tier" data-program="actor-base">
-                                <span class="tier-top">
-                                    <span class="tier-age">8–12 лет</span>
-                                    <span class="badge">База</span>
-                                </span>
+                            <button type="button" class="tier show" data-program="actor-base" data-tier="base">
+                                <span class="tier-price">10 000 <i>₽/мес</i></span>
                                 <span class="tier-meta">2 месяца · группы 8–12 чел.</span>
                                 <span class="tier-desc">Развитие эмоционального интеллекта. Итог — Проф ориентация и авторский взгляд.</span>
-                                <span class="tier-price">10 000 ₽<i>/мес</i></span>
+                                <span class="tier-go">Выбрать</span>
                             </button>
 
-                            <button type="button" class="tier" data-program="actor-pro">
-                                <span class="tier-top">
-                                    <span class="tier-age">13–17 лет</span>
-                                    <span class="badge badge-pro">Про</span>
-                                </span>
+                            <button type="button" class="tier" data-program="actor-pro" data-tier="pro">
+                                <span class="tier-price">14 000 <i>₽/мес</i></span>
                                 <span class="tier-meta">5 месяцев · группы 8–10 чел.</span>
                                 <span class="tier-desc">Развитие эмоционального интеллекта. Итог — Профориентация и авторский взгляд. Итог — моноспектакль.</span>
-                                <span class="tier-price">14 000 ₽<i>/мес</i></span>
+                                <span class="tier-go">Выбрать</span>
                             </button>
                         </div>
                     </article>
@@ -182,24 +186,18 @@
                         <p class="prog-desc">Создание авторского кино от идеи до реализации. Развитие визуального мышления и режиссерских навыков.</p>
 
                         <div class="tiers">
-                            <button type="button" class="tier" data-program="director-base">
-                                <span class="tier-top">
-                                    <span class="tier-age">8–12 лет</span>
-                                    <span class="badge">База</span>
-                                </span>
+                            <button type="button" class="tier show" data-program="director-base" data-tier="base">
+                                <span class="tier-price">11 000 <i>₽/мес</i></span>
                                 <span class="tier-meta">4 месяца</span>
                                 <span class="tier-desc">Киноязык и блогерство через игру. Режиссеры снимают наших актёров.</span>
-                                <span class="tier-price">11 000 ₽<i>/мес</i></span>
+                                <span class="tier-go">Выбрать</span>
                             </button>
 
-                            <button type="button" class="tier" data-program="director-pro">
-                                <span class="tier-top">
-                                    <span class="tier-age">13–17 лет</span>
-                                    <span class="badge badge-pro">Про</span>
-                                </span>
+                            <button type="button" class="tier" data-program="director-pro" data-tier="pro">
+                                <span class="tier-price">12 000 <i>₽/мес</i></span>
                                 <span class="tier-meta">6 месяцев</span>
                                 <span class="tier-desc">Сложные навыки и монтаж. Подготовка портфолио для вуза или карьеры.</span>
-                                <span class="tier-price">12 000 ₽<i>/мес</i></span>
+                                <span class="tier-go">Выбрать</span>
                             </button>
                         </div>
                     </article>
@@ -213,13 +211,12 @@
                         <p class="prog-desc">Освоение полного цикла создания подкастов. Развитие уверенной речи и цифровой грамотности.</p>
 
                         <div class="tiers">
-                            <button type="button" class="tier tier-solo" data-program="podcast">
-                                <span class="tier-top">
-                                    <span class="tier-age">8–15 лет</span>
-                                    <span class="badge">Полный курс</span>
-                                </span>
+                            <!-- Курс единый для 8–15 лет, поэтому виден при любом переключателе -->
+                            <button type="button" class="tier show" data-program="podcast" data-tier="both">
+                                <span class="tier-price">7 000 <i>₽/мес — 14 000 ₽ за курс</i></span>
+                                <span class="tier-meta">Полный курс · 8–15 лет</span>
                                 <span class="tier-desc">Освоение полного цикла: от идеи до публикации. Развитие уверенной речи и цифровой грамотности.</span>
-                                <span class="tier-price">7 000 ₽<i>/мес — 14 000 ₽ за курс</i></span>
+                                <span class="tier-go">Выбрать</span>
                             </button>
                         </div>
                     </article>
@@ -233,7 +230,7 @@
         <section id="mentors" class="band">
             <div class="wrap">
                 <p class="kicker reveal">Команда</p>
-                <h2 class="band-title reveal">Наши наставники</h2>
+                <h2 class="band-title reveal t-wipe">Наши наставники</h2>
 
                 <div class="crew">
                     <article class="member reveal">
@@ -314,7 +311,7 @@
         <section id="application" class="band">
             <div class="wrap">
                 <p class="kicker reveal">Запись</p>
-                <h2 class="band-title reveal">Записаться на занятие</h2>
+                <h2 class="band-title reveal t-wipe">Записаться на занятие</h2>
 
                 <div class="book reveal">
                     <aside class="book-side">
@@ -379,7 +376,7 @@
         <section id="contacts" class="band">
             <div class="wrap">
                 <p class="kicker reveal">Адрес</p>
-                <h2 class="band-title reveal">Контакты</h2>
+                <h2 class="band-title reveal t-wipe">Контакты</h2>
 
                 <div class="contacts">
                     <div class="contact-box reveal">

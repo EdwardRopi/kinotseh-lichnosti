@@ -116,6 +116,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const y = window.pageYOffset;
         header?.classList.toggle('stuck', y > 10);
 
+        // Плёнка идёт через кадровое окно вместе с прокруткой
+        if (!calmMotion) {
+            document.documentElement.style.setProperty('--film', (-y * 0.22).toFixed(1) + 'px');
+        }
+
         let current = '';
         sections.forEach(s => {
             if (y >= s.offsetTop - 200) current = s.getAttribute('id');
@@ -154,6 +159,32 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         revealItems.forEach(el => el.classList.add('in'));
     }
+
+    /* ---------------- Переключатель возрастной группы ---------------- */
+    /* Возраст вынесен из карточек в один переключатель: карточка
+       показывает ровно один уровень, а не оба сразу. */
+
+    const ageSwitch = document.querySelector('.switch');
+    const allTiers = document.querySelectorAll('.tier');
+
+    function showTier(kind) {
+        if (!ageSwitch) return;
+
+        ageSwitch.dataset.active = kind;
+        ageSwitch.querySelectorAll('.sw').forEach(btn => {
+            btn.setAttribute('aria-pressed', String(btn.dataset.tier === kind));
+        });
+
+        allTiers.forEach(tier => {
+            // «both» — курс подкаста, он единый для 8–15 лет
+            const visible = tier.dataset.tier === kind || tier.dataset.tier === 'both';
+            tier.classList.toggle('show', visible);
+        });
+    }
+
+    ageSwitch?.querySelectorAll('.sw').forEach(btn => {
+        btn.addEventListener('click', () => showTier(btn.dataset.tier));
+    });
 
     /* ======================= ФОРМА ======================= */
 
