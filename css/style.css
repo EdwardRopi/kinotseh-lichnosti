@@ -80,7 +80,9 @@ button { font: inherit; color: inherit; }
     width: 100%;
     max-width: var(--wrap);
     margin: 0 auto;
-    padding: 0 26px;
+    /* env() — чтобы на телефонах с вырезом контент не влезал под скругления */
+    padding-left: max(26px, env(safe-area-inset-left));
+    padding-right: max(26px, env(safe-area-inset-right));
 }
 
 .band { padding: clamp(64px, 8.5vw, 110px) 0; }
@@ -262,10 +264,13 @@ button { font: inherit; color: inherit; }
 .kicker.reveal:not(.in)::before { width: 0; }
 
 .hero-title {
-    font-size: clamp(1.9rem, 4.3vw, 3.5rem);
+    /* Unbounded — широкая гарнитура, поэтому на узких экранах кегль
+       ведём от vw, а не упираем в фиксированный минимум */
+    font-size: clamp(1.6rem, 6.2vw, 3.5rem);
     font-weight: 800;
     letter-spacing: -0.035em;
     margin-bottom: 24px;
+    text-wrap: balance;
 }
 .tint { color: var(--lime); }
 
@@ -292,7 +297,12 @@ button { font: inherit; color: inherit; }
 
 .slate-clap {
     transform-origin: 6% 100%;
-    animation: clap 1.5s cubic-bezier(0.55, 0, 0.2, 1) 0.35s both;
+    transform: rotate(-31deg);
+}
+/* Срабатывает, когда попадает в кадр, а не по таймеру: на телефоне
+   хлопушка уходит ниже первого экрана и по таймеру её никто не увидит */
+.slate.go .slate-clap {
+    animation: clap 1.35s cubic-bezier(0.55, 0, 0.2, 1) 0.15s both;
 }
 .slate-clap .clap-teeth { border: 1px solid var(--rail-2); border-bottom: none; }
 
@@ -407,7 +417,9 @@ button { font: inherit; color: inherit; }
 
 .progs {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    /* min() обязателен: без него на экранах уже 310px колонка не сжимается
+       и страница уезжает вбок */
+    grid-template-columns: repeat(auto-fit, minmax(min(310px, 100%), 1fr));
     gap: 18px;
     align-items: start;
 }
@@ -588,7 +600,7 @@ button { font: inherit; color: inherit; }
 
 .crew {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(290px, 100%), 1fr));
     gap: 20px;
     align-items: start;
 }
@@ -841,10 +853,48 @@ button { font: inherit; color: inherit; }
 .socials a:hover { color: var(--gate); background: var(--lime); border-color: var(--lime); }
 
 .map {
+    position: relative;
     border: 1px solid var(--rail);
     line-height: 0;
     overflow: hidden;
 }
+
+/* Пока карта не включена, она не перехватывает прокрутку страницы —
+   на телефоне это иначе превращается в ловушку для пальца */
+.map-veil {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    display: grid;
+    place-content: center;
+    padding: 16px;
+    background: rgba(12, 16, 12, 0.55);
+    border: none;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1.5;
+    color: var(--ink);
+    text-align: center;
+    transition: opacity 0.35s var(--ease), visibility 0.35s var(--ease), background 0.25s var(--ease);
+}
+.map-veil:hover { background: rgba(12, 16, 12, 0.4); }
+.map-veil::before {
+    content: '';
+    display: block;
+    width: 34px; height: 34px;
+    margin: 0 auto 12px;
+    border: 1px solid var(--lime);
+    border-radius: 50%;
+    background:
+        linear-gradient(var(--lime), var(--lime)) center / 2px 12px no-repeat,
+        linear-gradient(var(--lime), var(--lime)) center / 12px 2px no-repeat;
+}
+.map.live .map-veil { opacity: 0; visibility: hidden; }
 .map iframe {
     display: block;
     width: 100%;
@@ -926,10 +976,10 @@ button { font: inherit; color: inherit; }
     opacity: 0;
     animation: cut 0.7s var(--ease) forwards;
 }
-.hero-copy > *:nth-child(1) { animation-delay: 1.25s; }
-.hero-copy > *:nth-child(2) { animation-delay: 1.35s; }
-.hero-copy > *:nth-child(3) { animation-delay: 1.45s; }
-.hero-copy > *:nth-child(4) { animation-delay: 1.55s; }
+.hero-copy > *:nth-child(1) { animation-delay: 0.15s; }
+.hero-copy > *:nth-child(2) { animation-delay: 0.26s; }
+.hero-copy > *:nth-child(3) { animation-delay: 0.37s; }
+.hero-copy > *:nth-child(4) { animation-delay: 0.48s; }
 
 @keyframes cut {
     from { opacity: 0; transform: translateY(12px); }
@@ -939,7 +989,7 @@ button { font: inherit; color: inherit; }
 /* ======================== АДАПТИВНОСТЬ ======================== */
 
 @media (max-width: 1000px) {
-    .hero-grid { grid-template-columns: 1fr; gap: 44px; }
+    .hero-grid { grid-template-columns: 1fr; gap: 38px; }
     .about { grid-template-columns: 1fr; gap: 32px; }
     .book { grid-template-columns: 1fr; }
     .book-side { border-right: none; border-bottom: 1px solid var(--rail); }
@@ -947,7 +997,29 @@ button { font: inherit; color: inherit; }
     .foot { grid-template-columns: 1fr 1fr; }
 }
 
+/* ---------------------- Планшет и телефон ---------------------- */
+
 @media (max-width: 760px) {
+    :root { --head-h: 58px; }
+
+    /* Вертикальные отступы ужимаем: на телефоне воздух дороже */
+    .band { padding: 56px 0; }
+    .hero { padding-top: calc(var(--head-h) + 34px); }
+    .hero-grid { padding-bottom: 52px; }
+
+    /* Переносы расставлены для широкого экрана — здесь текст течёт сам */
+    .hero-title br { display: none; }
+    .hero-sub { margin-bottom: 28px; }
+
+    .kicker { letter-spacing: 0.15em; margin-bottom: 16px; }
+    .band-lead { margin-bottom: 32px; }
+    .band-title + .about,
+    .band-title + .progs,
+    .band-title + .crew,
+    .band-title + .book,
+    .band-title + .contacts { margin-top: 32px; }
+
+    /* --- Меню --- */
     .burger { display: flex; }
 
     .nav {
@@ -956,7 +1028,7 @@ button { font: inherit; color: inherit; }
         flex-direction: column;
         align-items: stretch;
         gap: 0;
-        padding: 14px 26px 26px;
+        padding: 10px 22px 22px;
         background: var(--gate);
         border-bottom: 1px solid var(--rail);
         transform: translateY(-12px);
@@ -968,24 +1040,74 @@ button { font: inherit; color: inherit; }
 
     .nav-link { padding: 15px 0; font-size: 0.9rem; border-bottom: 1px solid var(--rail); }
     .nav-link:hover { background: none; }
-    .cta-sm { margin: 16px 0 0; padding: 15px 18px; }
+    .cta-sm { margin: 16px 0 0; padding: 16px 18px; font-size: 0.8rem; }
 
+    /* --- Раскладки в одну колонку --- */
     .gates { grid-template-columns: 1fr; }
-    .switch { width: 100%; }
-    .sw { padding: 14px 10px; font-size: 0.73rem; }
-    .sw span { display: block; margin: 3px 0 0; }
     .row { grid-template-columns: 1fr; gap: 0; }
     .sf-split { grid-template-columns: 1fr; gap: 14px; }
-    .foot { grid-template-columns: 1fr; gap: 28px; }
+    .foot { grid-template-columns: 1fr; gap: 26px; }
+
     .actions { flex-direction: column; align-items: stretch; }
     .cta, .cta-ghost { text-align: center; }
+
+    /* --- Переключатель возраста: подписи в две строки --- */
+    .switch { width: 100%; }
+    .sw { padding: 12px 8px; font-size: 0.75rem; }
+    .sw span { display: block; margin: 4px 0 0; }
+
+    /* Портрет 4:5 на всю ширину слишком высокий — берём квадрат */
+    .frame { aspect-ratio: 1 / 1; margin-bottom: 16px; }
+
+    /* --- Пальцевые цели не меньше 44px --- */
+    .socials a { width: 46px; height: 46px; }
+    .consent input { width: 22px; height: 22px; }
+    .consent label { font-size: 0.86rem; }
+
+    .foot-bottom { flex-direction: column; gap: 6px; }
+
+    /* Наведение на телефоне не существует — убираем сдвиги,
+       чтобы касание не оставляло элемент в «зависшем» состоянии */
+    .prog:hover { transform: none; }
+    .gate:hover { clip-path: polygon(0 0, calc(100% - var(--notch)) 0, 100% var(--notch), 100% 100%, 0 100%); }
 }
 
+/* ------------------------- Узкий телефон ------------------------- */
+
 @media (max-width: 520px) {
-    :root { --notch: 14px; }
-    .wrap { padding: 0 18px; }
-    .map iframe { height: 340px; }
-    .prog, .member, .contact-box { padding: 22px 18px; }
+    :root { --notch: 13px; }
+
+    .wrap {
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
+    }
+
+    .band { padding: 46px 0; }
+    .hero { padding-top: calc(var(--head-h) + 26px); }
+    .hero-grid { gap: 30px; padding-bottom: 44px; }
+
+    /* Срезы углов пропорционально мельче, иначе съедают узкую карточку */
+    .slate-base { clip-path: polygon(0 0, calc(100% - 17px) 0, 100% 17px, 100% 100%, 0 100%); }
+    .prog       { clip-path: polygon(0 0, calc(100% - 17px) 0, 100% 17px, 100% 100%, 0 100%); }
+    .member     { clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%); }
+    .book       { clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%); }
+
+    .slate-fields { padding: 20px 18px 22px; gap: 15px; }
+    .slate-fields dd { font-size: 1.02rem; }
+    .clap-teeth { height: 24px; }
+    .teeth-static { height: 18px; }
+
+    .prog, .member, .contact-box { padding: 20px 16px; }
+    .prog { padding-top: 24px; }
+    .book-side, .book-form { padding: 22px 18px; }
+    .gate { padding: 20px 17px; }
+
+    .tier { padding: 18px 16px; gap: 10px; }
+    .tier-price { font-size: 1.55rem; }
+
+    .cta, .cta-ghost { padding: 15px 20px; }
+    .map iframe { height: 300px; }
+    .cv li { font-size: 0.84rem; }
 }
 
 /* ==================== ДОСТУПНОСТЬ И МОТОРИКА ==================== */
@@ -1009,6 +1131,6 @@ button { font: inherit; color: inherit; }
     .reveal.t-wipe { clip-path: none; }
     .kicker::before { width: 22px; }
     .hero-copy > * { opacity: 1; animation: none; }
-    .slate-clap { animation: none; }
+    .slate-clap, .slate.go .slate-clap { animation: none; transform: none; }
     .perf { background-position: 0 0; }
 }

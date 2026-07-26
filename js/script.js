@@ -160,6 +160,36 @@ document.addEventListener('DOMContentLoaded', function () {
         revealItems.forEach(el => el.classList.add('in'));
     }
 
+    /* ---------------- Хлопушка срабатывает в кадре ---------------- */
+    /* На телефоне слейт уходит ниже первого экрана, поэтому запуск
+       по таймеру там просто пропал бы мимо зрителя. */
+
+    const slate = document.getElementById('slate');
+
+    if (slate) {
+        if ('IntersectionObserver' in window && !calmMotion) {
+            const clapIO = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    entry.target.classList.add('go');
+                    obs.unobserve(entry.target);
+                });
+            }, { threshold: 0.35 });
+
+            clapIO.observe(slate);
+        } else {
+            slate.classList.add('go');
+        }
+    }
+
+    /* ---------------- Карта включается по нажатию ---------------- */
+    /* Иначе на телефоне палец над картой листает карту, а не страницу. */
+
+    const mapBox = document.querySelector('.map');
+    mapBox?.querySelector('.map-veil')?.addEventListener('click', function () {
+        mapBox.classList.add('live');
+    });
+
     /* ---------------- Переключатель возрастной группы ---------------- */
     /* Возраст вынесен из карточек в один переключатель: карточка
        показывает ровно один уровень, а не оба сразу. */
