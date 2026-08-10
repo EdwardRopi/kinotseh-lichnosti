@@ -1,0 +1,28 @@
+# ============================================================
+# Один канонический адрес сайта: https://кинокрд.рф без www.
+#
+# Сертификат Let's Encrypt выписан на оба имени, поэтому и www,
+# и апекс открываются без предупреждений — но индексироваться
+# и показываться в адресной строке должен один адрес.
+# ============================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # www → без www, сразу на https
+    RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+
+    # http → https.
+    # Проверяем и X-Forwarded-Proto: TLS терминирует nginx, и до Apache
+    # запрос доходит уже по http — без этого условия получится петля.
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+</IfModule>
+
+# Журнал заявок и конфиг лежат выше public_html и по HTTP недоступны.
+# Это подстраховка на случай, если их когда-нибудь положат рядом с сайтом.
+<FilesMatch "\.(jsonl|log)$">
+    Require all denied
+</FilesMatch>
