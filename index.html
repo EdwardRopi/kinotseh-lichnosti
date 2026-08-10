@@ -387,6 +387,13 @@
                             <input type="checkbox" id="privacyPolicy" name="privacyPolicy" required>
                             <label for="privacyPolicy">Я согласен(на) на обработку моих персональных данных в соответствии с <a href="#" class="inline-link">Политикой конфиденциальности</a></label>
                         </p>
+                        <!-- Ловушка для ботов: поле скрыто и убрано из озвучки экранными
+                             читалками, человек его не увидит и не заполнит. Если оно
+                             пришло непустым — заявку отбрасываем на сервере. -->
+                        <p class="hp" aria-hidden="true">
+                            <label for="website">Не заполняйте это поле</label>
+                            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+                        </p>
                         <button type="submit" class="cta cta-block">Записаться на мастер класс</button>
                         <div id="formMessage" class="form-msg" role="status" aria-live="polite"></div>
                     </form>

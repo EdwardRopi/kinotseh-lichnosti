@@ -10,7 +10,13 @@
    подключают на стороне сервера либо средствами самого Formspree.
    ============================================================ */
 
-const FORMSPREE_URL = 'https://formspree.io/f/xvzwnpgw';
+/* Заявки принимает send.php на этом же хостинге. Токены MAX и доступ
+   к почте лежат в конфиге выше public_html и в браузер не попадают. */
+const SEND_URL = '/send.php';
+
+/* Момент загрузки страницы: по нему сервер отличает человека от бота —
+   форму, отправленную за пару секунд, заполнял скрипт. */
+const PAGE_LOADED_AT = Date.now();
 
 const PROGRAMS = {
     'actor-base': 'Актер: суть (8-12 лет, База)',
@@ -22,32 +28,35 @@ const PROGRAMS = {
 
 const calmMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-async function sendToFormspree(data, programText) {
+async function sendLead(data) {
     try {
-        const response = await fetch(FORMSPREE_URL, {
+        const response = await fetch(SEND_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
             body: JSON.stringify({
-                _subject: `Новая заявка с сайта Киноцех личности: ${data.name}`,
                 name: data.name,
                 phone: data.phone,
                 email: data.email,
                 childAge: data.childAge,
-                program: programText,
-                message: data.message || 'Не указано',
-                privacyPolicy: data.privacyPolicy ? 'Да' : 'Нет',
-                timestamp: new Date().toLocaleString('ru-RU'),
-                source: 'kinotseh-website'
+                program: data.program,
+                message: data.message,
+                privacyPolicy: data.privacyPolicy,
+                website: data.website,
+                elapsed: Math.round((Date.now() - PAGE_LOADED_AT) / 1000)
             })
         });
 
-        return response.ok;
+        const result = await response.json().catch(() => null);
+        return {
+            ok: !!(result && result.ok),
+            message: result && result.message ? result.message : null
+        };
     } catch (error) {
         console.error('Ошибка отправки заявки:', error);
-        return false;
+        return { ok: false, message: null };
     }
 }
 
@@ -320,7 +329,8 @@ document.addEventListener('DOMContentLoaded', function () {
             childAge: childAge.value.trim(),
             program: program.value,
             message: document.getElementById('message').value.trim(),
-            privacyPolicy: document.getElementById('privacyPolicy').checked
+            privacyPolicy: document.getElementById('privacyPolicy').checked,
+            website: document.getElementById('website')?.value || ''
         };
 
         clearBad();
@@ -363,16 +373,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         say('Отправляем заявку…', 'info');
 
-        const sent = await sendToFormspree(data, PROGRAMS[data.program] || data.program);
+        const sent = await sendLead(data);
 
-        if (sent) {
-            say('Заявка отправлена. Мы свяжемся с вами в течение дня.', 'ok');
+        if (sent.ok) {
+            say(sent.message || 'Заявка отправлена. Мы свяжемся с вами в течение дня.', 'ok');
             form.reset();
             clearBad();
             document.querySelectorAll('.tier.picked').forEach(el => el.classList.remove('picked'));
             setTimeout(() => { formMsg.className = 'form-msg'; }, 6000);
         } else {
-            say('Не удалось отправить. Попробуйте позже или позвоните нам.', 'err');
+            say(sent.message || 'Не удалось отправить. Попробуйте позже или позвоните нам.', 'err');
         }
 
         if (button) {

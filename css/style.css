@@ -1134,3 +1134,16 @@ button { font: inherit; color: inherit; }
     .slate-clap, .slate.go .slate-clap { animation: none; transform: none; }
     .perf { background-position: 0 0; }
 }
+
+/* ---------------- Ловушка для ботов ----------------
+   Прячем так, чтобы поле оставалось в DOM и его находили скрипты-заполнители,
+   но человек не видел. display:none часть ботов распознаёт и пропускает,
+   поэтому уводим за край экрана. */
+
+.hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
