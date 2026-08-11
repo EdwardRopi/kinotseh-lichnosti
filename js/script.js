@@ -121,6 +121,40 @@ document.addEventListener('DOMContentLoaded', function () {
     const sections = document.querySelectorAll('section[id]');
     let ticking = false;
 
+    /* ---------------- Сцены ----------------
+       Каждой секции — имя и грейдинг, как разным сценам в фильме.
+       Оттенки держим мизерными: всё, что выше 8% прозрачности,
+       начинает съедать контраст текста. */
+
+    const SCENES = {
+        home:        { name: 'Начало',      grade: 'rgba(150, 175, 205, 0.035)' },
+        about:       { name: 'О школе',     grade: 'rgba(140, 170, 200, 0.05)'  },
+        directions:  { name: 'Программы',   grade: 'rgba(232, 213, 172, 0.055)' },
+        mentors:     { name: 'Наставники',  grade: 'rgba(6, 9, 6, 0.10)'        },
+        application: { name: 'Запись',      grade: 'rgba(201, 242, 58, 0.045)'  },
+        contacts:    { name: 'Контакты',    grade: 'rgba(208, 138, 92, 0.05)'   }
+    };
+
+    const sceneOrder = Array.prototype.map.call(sections, s => s.getAttribute('id'));
+    const tcScene = document.getElementById('tcScene');
+    const tcTime  = document.getElementById('tcTime');
+    const grade   = document.querySelector('.grade');
+    let lastScene = '';
+
+    /* Условный хронометраж: доля прокрутки раскладывается в таймкод
+       четырёхминутного ролика на 24 кадрах в секунду. Числа взяты не
+       с потолка — 24 кадра это киностандарт, и дробная часть бежит
+       достаточно быстро, чтобы счётчик выглядел живым. */
+    function timecode(fraction) {
+        const totalFrames = Math.round(fraction * 4 * 60 * 24);
+        const f = totalFrames % 24;
+        const s = Math.floor(totalFrames / 24) % 60;
+        const m = Math.floor(totalFrames / (24 * 60)) % 60;
+        const h = Math.floor(totalFrames / (24 * 60 * 60));
+        const pad = n => String(n).padStart(2, '0');
+        return pad(h) + ':' + pad(m) + ':' + pad(s) + ':' + pad(f);
+    }
+
     function onScroll() {
         const y = window.pageYOffset;
         header?.classList.toggle('stuck', y > 10);
@@ -158,6 +192,22 @@ document.addEventListener('DOMContentLoaded', function () {
         navLinks.forEach(link => {
             link.classList.toggle('on', link.getAttribute('href') === '#' + current);
         });
+
+        /* Таймкод и номер сцены */
+        if (tcTime) tcTime.textContent = timecode(progress);
+
+        if (current && current !== lastScene) {
+            lastScene = current;
+            const scene = SCENES[current];
+            const no = String(sceneOrder.indexOf(current) + 1).padStart(2, '0');
+
+            if (tcScene) {
+                tcScene.textContent = 'СЦ. ' + no + (scene ? ' · ' + scene.name : '');
+            }
+            if (grade && scene) {
+                document.documentElement.style.setProperty('--grade', scene.grade);
+            }
+        }
 
         ticking = false;
     }
@@ -367,6 +417,31 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    /* ---------------- Обводка жирным карандашом ----------------
+       В каждую карточку кладём контур будущего росчерка. Разметку
+       держим здесь, а не в HTML: это чистая декорация, и странице
+       незачем таскать её в исходнике.
+
+       Контур намеренно незамкнутый и слегка кривой — ровный овал
+       читается как рамка, а не как след грифеля. */
+
+    const MARK_PATH = 'M8,52 C7,24 30,9 53,9 C79,9 94,25 93,50 C92,76 71,93 47,92 ' +
+                      'C23,91 8,75 8,50 C8,40 10,31 15,25';
+
+    document.querySelectorAll('.tier').forEach(tier => {
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', 'tier-mark');
+        svg.setAttribute('viewBox', '0 0 100 100');
+        /* Растягиваем по форме карточки, а не вписываем квадрат */
+        svg.setAttribute('preserveAspectRatio', 'none');
+        svg.setAttribute('aria-hidden', 'true');
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', MARK_PATH);
+        svg.appendChild(path);
+        tier.appendChild(svg);
+    });
+
     /* Выбор программы кликом по уровню в карточке */
     document.querySelectorAll('.tier').forEach(tier => {
         tier.addEventListener('click', function () {
@@ -377,6 +452,16 @@ document.addEventListener('DOMContentLoaded', function () {
             program.dispatchEvent(new Event('change'));
 
             document.querySelectorAll('.tier.picked').forEach(el => el.classList.remove('picked'));
+
+            /* Перерисовка с нуля: без сброса повторный выбор той же
+               карточки не проигрывает росчерк заново. */
+            const mark = this.querySelector('.tier-mark path');
+            if (mark) {
+                mark.style.animation = 'none';
+                void mark.offsetWidth;
+                mark.style.animation = '';
+            }
+
             this.classList.add('picked');
 
             scrollTo(document.getElementById('application'));

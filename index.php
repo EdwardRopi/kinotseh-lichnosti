@@ -99,8 +99,15 @@ function asset($path) {
     <!-- Свет монтажной лампы: закреплён за экраном, контент проходит сквозь него -->
     <div class="glow" aria-hidden="true"></div>
 
-    <!-- Сколько страницы пройдено -->
-    <div class="progress" aria-hidden="true"></div>
+    <!-- Цветокоррекция сцены: слой поверх всей страницы, оттенок ведёт скрипт -->
+    <div class="grade" aria-hidden="true"></div>
+
+    <!-- Таймкод: сколько пройдено и в какой мы сцене -->
+    <div class="tc" aria-hidden="true">
+        <span class="tc-scene" id="tcScene">СЦ. 01</span>
+        <span class="tc-time" id="tcTime">00:00:00:00</span>
+        <span class="tc-bar"></span>
+    </div>
 
     <header class="header" id="header">
         <div class="wrap rail">

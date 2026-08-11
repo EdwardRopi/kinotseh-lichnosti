@@ -1131,23 +1131,95 @@ button { font: inherit; color: inherit; }
    Три приёма ниже возвращают его — счётчик пройденного, глубина фона
    и ступенчатое появление блоков вместо одновременного. */
 
-/* ---------------- Сколько плёнки прошло ----------------
-   Тонкая полоса вверху: показывает долю прочитанного. На длинной
-   странице это единственный дешёвый способ сказать «осталось немного». */
+/* ---------------- Таймкод ----------------
+   Вместо обычной полосы прогресса — счётчик с монтажной станции.
+   Он говорит то же самое, но на языке ремесла: сколько отснято
+   и в какой мы сцене. Полоса прогресса осталась, но ужалась до
+   подчёркивания под цифрами — два индикатора одного и того же
+   спорили бы друг с другом. */
 
-.progress {
+.tc {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    z-index: 9999;
+    left: 18px;
+    bottom: 18px;
+    z-index: 9996;
     pointer-events: none;
-    background: linear-gradient(90deg, var(--lime), var(--sand));
+    display: grid;
+    gap: 3px;
+    padding: 9px 12px 8px;
+    background: rgba(12, 16, 12, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--rail);
+    clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 0 100%);
+    font-family: var(--mono);
+    /* Появляется вместе со страницей, а не раньше неё */
+    animation: tc-in 0.5s var(--ease) 0.75s both;
+}
+
+@keyframes tc-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
+}
+
+.tc-scene {
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--faint);
+    white-space: nowrap;
+}
+
+.tc-time {
+    font-size: 0.86rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    color: var(--lime);
+    /* Иначе блок дышит по ширине на каждом кадре */
+    font-variant-numeric: tabular-nums;
+}
+
+.tc-bar {
+    display: block;
+    height: 1px;
+    margin-top: 2px;
+    background: var(--rail-2);
+}
+.tc-bar::before {
+    content: '';
+    display: block;
+    height: 100%;
+    background: var(--lime);
     transform: scaleX(var(--progress, 0));
     transform-origin: 0 50%;
-    /* Без перехода полоса дёргается на инерционной прокрутке телефона */
+    /* Без перехода линия дёргается на инерционной прокрутке телефона */
     transition: transform 0.12s linear;
+}
+
+@media (max-width: 520px) {
+    .tc { left: 12px; bottom: 12px; padding: 7px 10px 6px; }
+    .tc-time { font-size: 0.76rem; }
+    .tc-scene { font-size: 0.55rem; }
+}
+
+/* ---------------- Цветокоррекция сцены ----------------
+   Слой поверх всей страницы: секции получают разный грейдинг, как
+   разные сцены в фильме. Держится на грани заметности — задача не
+   «покрасить», а сделать так, чтобы длинная страница читалась
+   последовательностью сцен, а не одной простынёй.
+
+   Прозрачность намеренно мизерная: всё, что выше 8%, начинает
+   съедать контраст текста. */
+
+.grade {
+    position: fixed;
+    inset: 0;
+    z-index: 9995;
+    pointer-events: none;
+    background: var(--grade, transparent);
+    transition: background 0.7s linear;
 }
 
 /* ---------------- Глубина фона ----------------
@@ -1759,4 +1831,60 @@ main {
 
 @media (prefers-reduced-motion: reduce) {
     .reels { display: none; }
+}
+
+
+/* ============== ОБВОДКА ЖИРНЫМ КАРАНДАШОМ ==============
+   Выбранный тариф обводится от руки — так отмечают нужный дубль
+   грифелем на распечатке. В палитре сайта цвет --sand с самого
+   начала подписан «жирный карандаш», но нигде не был показан.
+
+   Эффект стоит ровно в точке решения: человек выбирает уровень
+   и получает физическое подтверждение выбора. Это тот редкий
+   случай, когда анимация работает на заявку, а не против неё. */
+
+.tier { position: relative; }
+
+.tier-mark {
+    position: absolute;
+    top: -7px;
+    left: -7px;
+    width: calc(100% + 14px);
+    height: calc(100% + 14px);
+    pointer-events: none;
+    overflow: visible;
+    z-index: 1;
+}
+
+.tier-mark path {
+    fill: none;
+    stroke: var(--lime);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    /* Иначе растяжение по ширине карточки размажет линию по горизонтали */
+    vector-effect: non-scaling-stroke;
+    stroke-dasharray: 430;
+    stroke-dashoffset: 430;
+    opacity: 0;
+}
+
+/* Кривая скорости неравномерная: рука разгоняется в начале росчерка
+   и придерживает в конце. Ровный ход сразу выдаёт машину. */
+.tier.picked .tier-mark path {
+    animation: grease 0.62s cubic-bezier(0.32, 0.72, 0.35, 1) forwards;
+}
+
+@keyframes grease {
+    0%   { stroke-dashoffset: 430; opacity: 0; }
+    8%   { opacity: 1; }
+    100% { stroke-dashoffset: 0;   opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tier.picked .tier-mark path {
+        animation: none;
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
 }
