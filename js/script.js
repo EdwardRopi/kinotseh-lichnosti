@@ -510,7 +510,8 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.style.overflow = 'hidden';
             paint();
             if (!tick) tick = setInterval(paint, 1000);
-            promo.querySelector('.promo-x')?.focus();
+            const x = promo.querySelector('.promo-x');
+            if (x) x.focus();
         }
 
         function close() {
@@ -527,7 +528,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         /* Переход к форме — тоже закрытие: окно своё дело сделало */
-        promo.querySelector('.promo-go')?.addEventListener('click', close);
+        const go = promo.querySelector('.promo-go');
+        if (go) go.addEventListener('click', close);
 
         document.addEventListener('keydown', function (e) {
             if (promo.hidden) return;
@@ -551,10 +553,11 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        /* Не показываем тому, кто уже закрывал окно, и тому, кто пришёл
-           по ссылке прямо на форму: он и так знает, зачем пришёл. */
-        const skip = recall('promo-off') === '1' || location.hash === '#application';
-        if (!skip) setTimeout(open, SHOW_AFTER);
+        /* Единственная причина не показать окно — его уже закрывали
+           в этой сессии. Раньше здесь была ещё проверка на адрес с
+           #application, но такой адрес остаётся в строке браузера после
+           любого нажатия «Записаться», и окно потом молча не появлялось. */
+        if (recall('promo-off') !== '1') setTimeout(open, SHOW_AFTER);
     }
 
     /* ---------------- Актуальный год в футере ---------------- */

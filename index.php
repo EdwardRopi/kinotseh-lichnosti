@@ -3,6 +3,19 @@
    которые редактируются в админке (/admin). Остальная вёрстка статична. */
 require __DIR__ . '/lib/team.php';
 $team = team_load();
+
+/* Сама страница не кэшируется: состав команды меняется из админки,
+   и посетитель не должен видеть вчерашний список. */
+header('Cache-Control: no-cache, must-revalidate');
+
+/* К адресам стилей и скрипта дописывается время их изменения.
+   Файл поменялся — изменился и адрес, браузер обязан скачать заново.
+   Без этого приходится просить людей сбрасывать кэш вручную, а на
+   телефоне это умеют единицы. */
+function asset($path) {
+    $file = __DIR__ . '/' . $path;
+    return $path . '?v=' . (is_file($file) ? filemtime($file) : time());
+}
 ?><!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -44,7 +57,7 @@ $team = team_load();
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Onest:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
 </head>
 <body>
     <!-- Створки затвора: расходятся при открытии страницы.
@@ -441,6 +454,6 @@ $team = team_load();
         </div>
     </footer>
 
-    <script src="js/script.js"></script>
+    <script src="<?= asset('js/script.js') ?>"></script>
 </body>
 </html>
