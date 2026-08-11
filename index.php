@@ -50,6 +50,12 @@ $team = team_load();
     <!-- Зерно киноплёнки поверх страницы -->
     <div class="grain" aria-hidden="true"></div>
 
+    <!-- Свет монтажной лампы: закреплён за экраном, контент проходит сквозь него -->
+    <div class="glow" aria-hidden="true"></div>
+
+    <!-- Сколько страницы пройдено -->
+    <div class="progress" aria-hidden="true"></div>
+
     <header class="header" id="header">
         <div class="wrap rail">
             <a href="#home" class="brand">

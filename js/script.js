@@ -130,6 +130,13 @@ document.addEventListener('DOMContentLoaded', function () {
             document.documentElement.style.setProperty('--film', (-y * 0.22).toFixed(1) + 'px');
         }
 
+        /* Доля пройденного. Знаменатель — высота документа минус экран:
+           полоса должна заполниться ровно в конце страницы, а не тогда,
+           когда низ экрана коснётся последнего пикселя. */
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = scrollable > 0 ? Math.min(1, y / scrollable) : 0;
+        document.documentElement.style.setProperty('--progress', progress.toFixed(4));
+
         let current = '';
         sections.forEach(s => {
             if (y >= s.offsetTop - 200) current = s.getAttribute('id');
@@ -154,6 +161,19 @@ document.addEventListener('DOMContentLoaded', function () {
     /* ---------------- Появление блоков ---------------- */
 
     const revealItems = document.querySelectorAll('.reveal');
+
+    /* Соседи по контейнеру выезжают не одновременно, а лесенкой.
+       Индекс считаем среди таких же .reveal внутри общего родителя,
+       иначе задержку получили бы и одиночные блоки — без всякого смысла.
+       Потолок в четыре шага: дальше ожидание начинает раздражать. */
+    revealItems.forEach(el => {
+        const siblings = el.parentElement
+            ? Array.prototype.filter.call(el.parentElement.children, n => n.classList.contains('reveal'))
+            : [];
+        if (siblings.length > 1) {
+            el.style.setProperty('--d', Math.min(siblings.indexOf(el), 4));
+        }
+    });
 
     if ('IntersectionObserver' in window && !calmMotion) {
         const io = new IntersectionObserver((entries, obs) => {
