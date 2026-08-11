@@ -47,6 +47,10 @@ $team = team_load();
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <!-- Створки затвора: расходятся при открытии страницы.
+         Работают на чистом CSS, поэтому не могут «залипнуть» из-за скрипта. -->
+    <div class="gate-in" aria-hidden="true"><i></i></div>
+
     <!-- Зерно киноплёнки поверх страницы -->
     <div class="grain" aria-hidden="true"></div>
 

@@ -1255,3 +1255,119 @@ main, .foot { position: relative; z-index: 1; }
         transform: none;
     }
 }
+
+
+/* ================= ОТКРЫТИЕ КАДРОВОГО ОКНА =================
+   Появление страницы: две створки расходятся вверх и вниз, по шву
+   пробегает лаймовая нить. Это затвор камеры, а не «модный фейд» —
+   метафора взята оттуда же, откуда вся остальная графика сайта.
+
+   Сделано целиком на CSS. Если скрипт не загрузится или упадёт,
+   створки всё равно уедут: на JS здесь ничего не держится, и сайт
+   не может остаться закрытым чёрным экраном.
+
+   Весь эффект укладывается в 0.85 секунды. Дольше — и посетитель
+   начинает думать, что сайт не грузится. */
+
+.gate-in {
+    position: fixed;
+    inset: 0;
+    z-index: 9997;
+    pointer-events: none;
+}
+
+.gate-in::before,
+.gate-in::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 50.5%;                 /* нахлёст, чтобы не мелькала щель по шву */
+    background: var(--gate);
+    animation: gate-open 0.85s var(--ease) 0.05s forwards;
+}
+
+.gate-in::before { top: 0;    transform-origin: 50% 0; }
+.gate-in::after  { bottom: 0; transform-origin: 50% 100%; }
+
+@keyframes gate-open {
+    from { transform: scaleY(1); }
+    to   { transform: scaleY(0); }
+}
+
+/* Нить света по шву: сначала растягивается, потом гаснет вместе с створками */
+.gate-in i {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--lime);
+    transform: scaleX(0);
+    animation: gate-line 0.85s var(--ease) forwards;
+}
+
+@keyframes gate-line {
+    0%   { transform: scaleX(0);    opacity: 1; }
+    45%  { transform: scaleX(1);    opacity: 1; }
+    100% { transform: scaleX(1);    opacity: 0; }
+}
+
+/* Содержимое проявляется сразу за створками, но не «выезжает» заново:
+   у героя уже есть своя анимация, и второй слой движения читался бы как
+   рассинхрон. Здесь только проявка. */
+main {
+    animation: page-settle 0.5s var(--ease) 0.18s both;
+}
+
+@keyframes page-settle {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Шапка опускается последней — так собирается порядок: кадр, содержимое, интерфейс */
+.header {
+    animation: head-drop 0.55s var(--ease) 0.4s both;
+}
+
+@keyframes head-drop {
+    from { transform: translateY(-100%); }
+    to   { transform: none; }
+}
+
+/* ==================== АДАПТИВ: ЧЕГО НЕ ХВАТАЛО ==================== */
+
+/* ---------------- Телефон в альбомной ориентации ----------------
+   Высота экрана падает до 350–400 пикселей, и вертикальные отступы,
+   рассчитанные на портрет, съедают его целиком. Отдельный брейкпоинт
+   по высоте, а не по ширине: именно она здесь дефицитна. */
+
+@media (max-height: 540px) and (orientation: landscape) {
+    .band { padding: 38px 0; }
+    .hero { padding-top: calc(var(--head-h) + 16px); }
+    .hero-grid { gap: 24px; padding-bottom: 26px; }
+
+    /* Открытое меню длиннее экрана — без прокрутки нижние пункты
+       недостижимы, и это не видно, пока не попробуешь */
+    .nav {
+        max-height: calc(100vh - var(--head-h));
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .map iframe { height: 300px; }
+}
+
+/* ---------------- Очень широкие экраны ----------------
+   На мониторе 2К содержимое шириной 1180 пикселей висит узкой лентой
+   посреди пустоты. Немного расширяем — но не до края: строка длиннее
+   90 символов читается тяжело. */
+
+@media (min-width: 1700px) {
+    :root { --wrap: 1320px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gate-in { display: none; }
+    main, .header { animation: none; }
+}
