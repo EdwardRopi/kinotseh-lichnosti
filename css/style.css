@@ -1671,3 +1671,74 @@ main {
     .nav-link::before, .nav-link::after { display: none; }
     .nav::after { transition: none; }
 }
+
+
+/* ============== ЛЕНТЫ ПЛЁНКИ В ГЛУБИНЕ КАДРА ==============
+   Три перфорированные полосы, лежащие по диагонали далеко за
+   содержимым. При прокрутке каждая едет вдоль собственной оси
+   и еле заметно доворачивается — плёнка идёт через лентопротяжку.
+
+   Разные множители скорости дают ощущение глубины: дальняя лента
+   отстаёт от ближней, и фон перестаёт быть плоским.
+
+   Контраст держим на грани различимости. Фон, который замечают, —
+   это уже не фон, а помеха чтению. */
+
+.reels {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.reels i {
+    position: absolute;
+    left: -30%;
+    width: 160%;
+    height: 78px;
+
+    /* Полотно плюс два ряда перфорации по краям — та же геометрия,
+       что у разделителей секций, только крупнее и глуше */
+    background:
+        radial-gradient(circle at 50% 50%, rgba(12, 16, 12, 0.9) 0 3.4px, transparent 3.9px)
+            0 9px / 27px 20px repeat-x,
+        radial-gradient(circle at 50% 50%, rgba(12, 16, 12, 0.9) 0 3.4px, transparent 3.9px)
+            0 49px / 27px 20px repeat-x,
+        linear-gradient(rgba(42, 51, 39, 0.55), rgba(42, 51, 39, 0.55));
+
+    opacity: 0.5;
+    will-change: transform;
+}
+
+/* Порядок в transform важен: сначала поворот, потом сдвиг — тогда
+   лента едет вдоль себя, а не поперёк экрана. */
+
+.reels i:nth-child(1) {
+    top: 9%;
+    transform: rotate(calc(-17deg + var(--reel-rot, 0deg))) translateX(var(--reel-1, 0px));
+}
+
+.reels i:nth-child(2) {
+    top: 47%;
+    opacity: 0.34;
+    transform: rotate(calc(12deg - var(--reel-rot, 0deg))) translateX(var(--reel-2, 0px));
+}
+
+.reels i:nth-child(3) {
+    top: 79%;
+    opacity: 0.22;
+    transform: rotate(calc(-6deg + var(--reel-rot, 0deg))) translateX(var(--reel-3, 0px));
+}
+
+@media (max-width: 760px) {
+    /* На узком экране три ленты складываются в рябь: оставляем две
+       и делаем их тише — экран ближе к глазам, шум заметнее */
+    .reels i { height: 62px; opacity: 0.34; }
+    .reels i:nth-child(2) { opacity: 0.22; }
+    .reels i:nth-child(3) { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reels { display: none; }
+}

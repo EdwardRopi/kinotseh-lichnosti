@@ -127,7 +127,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Плёнка идёт через кадровое окно вместе с прокруткой
         if (!calmMotion) {
-            document.documentElement.style.setProperty('--film', (-y * 0.22).toFixed(1) + 'px');
+            const root = document.documentElement.style;
+            root.setProperty('--film', (-y * 0.22).toFixed(1) + 'px');
+
+            /* Фоновые ленты. Разные множители — разная удалённость:
+               ближняя идёт быстрее, дальняя отстаёт, и фон перестаёт
+               читаться плоским. Средняя движется навстречу остальным,
+               иначе три параллельных потока сливаются в один. */
+            root.setProperty('--reel-1', (y * 0.10).toFixed(1) + 'px');
+            root.setProperty('--reel-2', (-y * 0.16).toFixed(1) + 'px');
+            root.setProperty('--reel-3', (y * 0.06).toFixed(1) + 'px');
+
+            /* Доворот на всю страницу — единицы градусов. Больше —
+               и ленты начинают вертеться, перетягивая внимание. */
+            root.setProperty('--reel-rot', (y * 0.0022).toFixed(3) + 'deg');
         }
 
         /* Доля пройденного. Знаменатель — высота документа минус экран:

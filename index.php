@@ -93,6 +93,9 @@ function asset($path) {
     <!-- Зерно киноплёнки поверх страницы -->
     <div class="grain" aria-hidden="true"></div>
 
+    <!-- Ленты плёнки в глубине кадра: едут вдоль своей оси при прокрутке -->
+    <div class="reels" aria-hidden="true"><i></i><i></i><i></i></div>
+
     <!-- Свет монтажной лампы: закреплён за экраном, контент проходит сквозь него -->
     <div class="glow" aria-hidden="true"></div>
 
