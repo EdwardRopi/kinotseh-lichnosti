@@ -1520,3 +1520,154 @@ main {
 @media (prefers-reduced-motion: reduce) {
     .promo-back, .promo-card { animation: none; }
 }
+
+
+/* ============== МЕНЮ: УДАР И ИСКРЫ ==============
+   Пункты прилетают справа — оттуда, где стоит кнопка меню, будто
+   их метнули от неё. Разгон тяжёлый, приземление с перелётом и
+   отдачей, в момент удара по кромке бьёт лаймовая вспышка и
+   разлетаются искры.
+
+   Всё держится на CSS-анимациях: скрипт по-прежнему только вешает
+   класс .open, как и раньше. Меньше подвижных частей — меньше того,
+   что может не сработать на чужом телефоне. */
+
+@media (max-width: 760px) {
+
+    /* Сама панель раскрывается шторкой сверху, а не просто проявляется */
+    .nav {
+        clip-path: inset(0 0 100% 0);
+        transition: opacity var(--t), visibility var(--t), clip-path 0.42s var(--ease);
+        transform: none;
+    }
+    .nav.open { clip-path: inset(0 0 0 0); }
+
+    /* Нить света по нижней кромке панели — та же деталь, что у створок
+       на входе: панель «открывается», а не «появляется» */
+    .nav::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 1px;
+        background: var(--lime);
+        transform: scaleX(0);
+        transform-origin: 100% 50%;
+        transition: transform 0.45s var(--ease);
+    }
+    .nav.open::after { transform: scaleX(1); }
+
+    .nav-link,
+    .nav .cta-sm {
+        position: relative;
+        opacity: 0;
+        transform: translateX(54px);
+    }
+
+    /* Перелёт и отдача заложены в кривую: пункт проскакивает точку
+       покоя и возвращается — так читается вес, а не просто сдвиг */
+    .nav.open .nav-link,
+    .nav.open .cta-sm {
+        animation: hammer 0.46s cubic-bezier(0.2, 1.1, 0.28, 1.28) both;
+    }
+
+    .nav.open .nav-link:nth-child(1) { animation-delay: 0.06s; }
+    .nav.open .nav-link:nth-child(2) { animation-delay: 0.13s; }
+    .nav.open .nav-link:nth-child(3) { animation-delay: 0.20s; }
+    .nav.open .nav-link:nth-child(4) { animation-delay: 0.27s; }
+    .nav.open .cta-sm                { animation-delay: 0.34s; }
+
+    @keyframes hammer {
+        0%   { opacity: 0; transform: translateX(54px); }
+        55%  { opacity: 1; }
+        100% { opacity: 1; transform: none; }
+    }
+
+    /* --- Вспышка по кромке в момент удара --- */
+
+    .nav.open .nav-link::before {
+        content: '';
+        position: absolute;
+        left: -14px;
+        top: 50%;
+        width: 3px;
+        height: 3px;
+        margin-top: -1.5px;
+        background: var(--lime);
+        box-shadow: 0 0 10px 2px var(--lime);
+        opacity: 0;
+        /* Длительность подобрана так, чтобы вспышка на 62% пришлась
+           на 0.43 с — момент, когда летящий пункт достигает края */
+        animation: strike 0.7s ease-out both;
+        animation-delay: inherit;
+        pointer-events: none;
+    }
+
+    @keyframes strike {
+        0%   { opacity: 0; transform: scaleX(1); }
+        45%  { opacity: 0; }
+        /* Момент касания: точка растягивается в полосу вдоль кромки */
+        62%  { opacity: 1; transform: scaleX(26) scaleY(1.6); }
+        100% { opacity: 0; transform: scaleX(40) scaleY(0.4); }
+    }
+
+    /* --- Искры --- */
+    /* Разлёт сделан несколькими тенями на одном элементе: браузер
+       рисует их за один проход, и на слабом телефоне это не стоит
+       ничего, в отличие от россыпи отдельных узлов. */
+
+    .nav.open .nav-link::after {
+        content: '';
+        position: absolute;
+        left: -10px;
+        top: 50%;
+        width: 2px;
+        height: 2px;
+        border-radius: 50%;
+        background: transparent;
+        opacity: 0;
+        /* Разлёт начинается на 62% — те же 0.46 с, что и удар */
+        animation: sparks 0.75s ease-out both;
+        animation-delay: inherit;
+        pointer-events: none;
+    }
+
+    @keyframes sparks {
+        0%, 48% {
+            opacity: 0;
+            box-shadow:
+                0 0 0 0 var(--lime),
+                0 0 0 0 var(--sand),
+                0 0 0 0 var(--lime),
+                0 0 0 0 var(--sand),
+                0 0 0 0 var(--lime);
+        }
+        62% {
+            opacity: 1;
+            box-shadow:
+                 6px  -7px 0 0 var(--lime),
+                12px   4px 0 0 var(--sand),
+                 3px   9px 0 0 var(--lime),
+                17px  -4px 0 0 var(--sand),
+                 9px  -1px 0 0 var(--lime);
+        }
+        100% {
+            opacity: 0;
+            box-shadow:
+                20px -20px 0 -1px var(--lime),
+                34px  13px 0 -1px var(--sand),
+                10px  26px 0 -1px var(--lime),
+                44px -12px 0 -1px var(--sand),
+                27px  -3px 0 -1px var(--lime);
+        }
+    }
+}
+
+/* Удар — это движение. Кому движение противопоказано, тому просто меню. */
+@media (prefers-reduced-motion: reduce) {
+    .nav { clip-path: none; }
+    .nav-link, .nav .cta-sm { opacity: 1; transform: none; animation: none !important; }
+    .nav-link::before, .nav-link::after { display: none; }
+    .nav::after { transition: none; }
+}
