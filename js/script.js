@@ -273,21 +273,49 @@ document.addEventListener('DOMContentLoaded', function () {
         el?.addEventListener('change', () => el.classList.remove('bad'));
     });
 
-    /* Маска телефона */
+    /* ---------------- Маска телефона ----------------
+       Прежняя версия накапливала семёрки: она вырезала из строки всё,
+       кроме цифр, но «7» из префикса «+7» — тоже цифра, и она оставалась
+       в наборе. Дальше префикс приписывался заново, и каждое нажатие
+       добавляло ещё одну семёрку.
+
+       Здесь строка каждый раз собирается заново из чистых цифр, а код
+       страны хранится отдельно от номера и в набор не подмешивается. */
+
+    function formatPhone(raw) {
+        let digits = raw.replace(/\D/g, '');
+        if (!digits) return '';
+
+        /* Первая цифра — код страны. Восьмёрку приводим к семёрке,
+           а если человек начал сразу с кода оператора — подставляем сами. */
+        if (digits[0] === '8') digits = '7' + digits.slice(1);
+        else if (digits[0] !== '7') digits = '7' + digits;
+
+        const rest = digits.slice(1, 11);
+
+        let out = '+7';
+        if (rest.length)      out += ' (' + rest.slice(0, 3);
+        if (rest.length >= 3) out += ')';
+        if (rest.length > 3)  out += ' ' + rest.slice(3, 6);
+        if (rest.length > 6)  out += '-' + rest.slice(6, 8);
+        if (rest.length > 8)  out += '-' + rest.slice(8, 10);
+        return out;
+    }
+
     if (phone) {
-        phone.placeholder = '+7 (XXX) XXX-XX-XX';
+        phone.placeholder = '+7 (999) 123-45-67';
+        phone.setAttribute('inputmode', 'tel');
+        phone.setAttribute('autocomplete', 'tel');
+
         phone.addEventListener('input', function (e) {
-            let v = e.target.value.replace(/\D/g, '');
+            e.target.value = formatPhone(e.target.value);
+        });
 
-            if (v.length > 0) {
-                v = '+7 (' + v;
-                if (v.length > 7) v = v.slice(0, 7) + ') ' + v.slice(7);
-                if (v.length > 12) v = v.slice(0, 12) + '-' + v.slice(12);
-                if (v.length > 15) v = v.slice(0, 15) + '-' + v.slice(15);
-                if (v.length > 18) v = v.slice(0, 18);
-            }
-
-            e.target.value = v;
+        /* Пустое поле не трогаем: пусть работает подсказка и проверка
+           обязательности. Один тап по полю не должен вписывать «+7». */
+        phone.addEventListener('focus', function (e) {
+            if (e.target.value.trim() === '') return;
+            e.target.value = formatPhone(e.target.value);
         });
     }
 
@@ -365,6 +393,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const missing = required.filter(f => !f.value);
         missing.forEach(f => markBad(f.id));
+
+        /* Недобранный номер выглядит заполненным, но перезвонить по нему
+           нельзя — проверяем длину, а не только «поле не пустое». */
+        if (!missing.length && data.phone.replace(/\D/g, '').length !== 11) {
+            markBad('phone');
+            say('Проверьте номер телефона: нужно 11 цифр', 'err');
+            return;
+        }
 
         if (missing.length) {
             say(`Заполните: ${missing.map(f => f.label).join(', ')}`, 'err');
