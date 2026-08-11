@@ -11,6 +11,7 @@
    ============================================================ */
 
 require dirname(__DIR__) . '/lib/team.php';
+require dirname(__DIR__) . '/lib/faq.php';
 
 define('ADMIN_FILE', dirname(dirname(__DIR__)) . '/kinokrd-admin.json');
 define('MAX_PHOTO',  5 * 1024 * 1024);
@@ -168,6 +169,60 @@ if ($loggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']
         redirect('ok=' . rawurlencode('Порядок изменён'));
     }
 
+    /* ---------- вопросы родителей ---------- */
+
+    if ($action === 'faq-save') {
+        $faq = faq_load();
+        $id  = isset($_POST['id']) ? trim($_POST['id']) : '';
+        $q   = trim(isset($_POST['q']) ? $_POST['q'] : '');
+
+        if ($q === '') {
+            $error = 'Вопрос обязателен.';
+        } else {
+            $idx  = $id !== '' ? faq_find($faq, $id) : null;
+            $item = $idx !== null ? $faq['items'][$idx] : array();
+
+            $item['q']       = $q;
+            $item['a']       = trim(isset($_POST['a']) ? $_POST['a'] : '');
+            $item['visible'] = !empty($_POST['visible']);
+
+            if ($idx !== null) {
+                $faq['items'][$idx] = $item;
+                $msg = 'Вопрос сохранён';
+            } else {
+                $item['id'] = faq_new_id($faq);
+                $faq['items'][] = $item;
+                $msg = 'Вопрос добавлен';
+            }
+            faq_save($faq);
+            redirect('tab=faq&ok=' . rawurlencode($msg));
+        }
+    }
+
+    if ($action === 'faq-delete') {
+        $faq = faq_load();
+        $idx = faq_find($faq, isset($_POST['id']) ? $_POST['id'] : '');
+        if ($idx !== null) {
+            array_splice($faq['items'], $idx, 1);
+            faq_save($faq);
+        }
+        redirect('tab=faq&ok=' . rawurlencode('Вопрос удалён'));
+    }
+
+    if ($action === 'faq-move') {
+        $faq = faq_load();
+        $idx = faq_find($faq, isset($_POST['id']) ? $_POST['id'] : '');
+        $dir = ($_POST['dir'] === 'up') ? -1 : 1;
+        $new = $idx + $dir;
+        if ($idx !== null && $new >= 0 && $new < count($faq['items'])) {
+            $tmp = $faq['items'][$idx];
+            $faq['items'][$idx] = $faq['items'][$new];
+            $faq['items'][$new] = $tmp;
+            faq_save($faq);
+        }
+        redirect('tab=faq&ok=' . rawurlencode('Порядок изменён'));
+    }
+
     if ($action === 'password') {
         $p1 = isset($_POST['password']) ? $_POST['password'] : '';
         $p2 = isset($_POST['password2']) ? $_POST['password2'] : '';
@@ -216,6 +271,9 @@ function upload_photo($file) {
 /* ---------- что показываем ---------- */
 
 $data    = team_load();
+$faq     = faq_load();
+$tab     = (isset($_GET['tab']) && $_GET['tab'] === 'faq') ? 'faq' : 'team';
+
 $editId  = isset($_GET['edit']) ? $_GET['edit'] : null;
 $editing = null;
 if ($loggedIn && $editId !== null) {
@@ -223,6 +281,14 @@ if ($loggedIn && $editId !== null) {
     $editing = $i !== null ? $data['members'][$i] : null;
 }
 $adding = $loggedIn && isset($_GET['add']);
+
+$faqEditId  = isset($_GET['faqedit']) ? $_GET['faqedit'] : null;
+$faqEditing = null;
+if ($loggedIn && $faqEditId !== null) {
+    $i = faq_find($faq, $faqEditId);
+    $faqEditing = $i !== null ? $faq['items'][$i] : null;
+}
+$faqAdding = $loggedIn && isset($_GET['faqadd']);
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -283,6 +349,13 @@ $adding = $loggedIn && isset($_GET['add']);
     .acts { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
     form.inline { display:inline; }
     .narrow { max-width:420px; }
+    .tabs { display:flex; gap:4px; }
+    .tab {
+        padding:9px 16px; border:1px solid var(--rail); border-radius:2px;
+        color:var(--dim); text-decoration:none; font-size:14px;
+    }
+    .tab:hover { color:var(--ink); }
+    .tab.on { color:var(--gate); background:var(--lime); border-color:var(--lime); font-weight:600; }
 </style>
 </head>
 <body>
@@ -368,6 +441,101 @@ $adding = $loggedIn && isset($_GET['add']);
         <p style="margin-top:24px"><button class="primary" type="submit">Сохранить</button></p>
     </form>
 
+<?php elseif ($faqEditing !== null || $faqAdding): ?>
+
+    <?php $q = $faqEditing !== null ? $faqEditing : array('id'=>'','q'=>'','a'=>'','visible'=>true); ?>
+
+    <div class="bar">
+        <h1><?= $faqEditing !== null ? 'Редактирование вопроса' : 'Новый вопрос' ?></h1>
+        <a class="btn" href="?tab=faq">← К списку</a>
+    </div>
+
+    <form method="post" class="card">
+        <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+        <input type="hidden" name="action" value="faq-save">
+        <input type="hidden" name="id" value="<?= e($q['id']) ?>">
+
+        <label>Вопрос
+            <span class="hint">Так, как его задают родители — своими словами, а не канцелярски.</span>
+        </label>
+        <input type="text" name="q" value="<?= e($q['q']) ?>" required autofocus>
+
+        <label>Ответ
+            <span class="hint">Между абзацами оставляйте пустую строку. Чем конкретнее ответ,
+            тем меньше поводов не записаться.</span>
+        </label>
+        <textarea name="a" style="min-height:190px"><?= e($q['a']) ?></textarea>
+
+        <label style="display:flex;align-items:center;gap:8px;margin-top:22px">
+            <input type="checkbox" name="visible" value="1" <?= !empty($q['visible']) ? 'checked' : '' ?> style="width:auto">
+            Показывать на сайте
+        </label>
+
+        <p style="margin-top:24px"><button class="primary" type="submit">Сохранить</button></p>
+    </form>
+
+<?php else: ?>
+
+    <div class="bar">
+        <div class="tabs">
+            <a class="tab <?= $tab === 'team' ? 'on' : '' ?>" href="?">Команда</a>
+            <a class="tab <?= $tab === 'faq'  ? 'on' : '' ?>" href="?tab=faq">Вопросы родителей</a>
+        </div>
+        <div class="acts">
+            <a class="btn" href="../" target="_blank">Открыть сайт</a>
+            <a class="btn" href="?logout=1">Выйти</a>
+        </div>
+    </div>
+
+<?php if ($tab === 'faq'): ?>
+
+    <div class="bar">
+        <div>
+            <h1>Вопросы родителей</h1>
+            <p class="sub" style="margin:0">Вопросов: <?= count($faq['items']) ?>. Раздел стоит на сайте прямо перед формой записи.</p>
+        </div>
+        <a class="btn primary" href="?faqadd=1">+ Добавить вопрос</a>
+    </div>
+
+    <?php if (!$faq['items']): ?>
+        <div class="card"><p style="margin:0;color:var(--dim)">Пока пусто. Если не добавить ни одного вопроса, раздел на сайте не появится вовсе.</p></div>
+    <?php endif; ?>
+
+    <?php foreach ($faq['items'] as $i => $item): ?>
+        <div class="card">
+            <div class="name">
+                <?= e($item['q']) ?>
+                <?php if (empty($item['visible'])): ?><span class="hidden-tag">· скрыт</span><?php endif; ?>
+            </div>
+            <div class="role"><?= e(mb_substr(preg_replace('/\s+/u', ' ', isset($item['a']) ? $item['a'] : ''), 0, 150)) ?></div>
+
+            <div class="acts" style="margin-top:12px">
+                <a class="btn tiny" href="?faqedit=<?= e($item['id']) ?>">Редактировать</a>
+
+                <form method="post" class="inline">
+                    <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                    <input type="hidden" name="action" value="faq-move">
+                    <input type="hidden" name="id" value="<?= e($item['id']) ?>">
+                    <button class="tiny" name="dir" value="up" <?= $i === 0 ? 'disabled' : '' ?>>↑</button>
+                </form>
+
+                <form method="post" class="inline">
+                    <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                    <input type="hidden" name="action" value="faq-move">
+                    <input type="hidden" name="id" value="<?= e($item['id']) ?>">
+                    <button class="tiny" name="dir" value="down" <?= $i === count($faq['items']) - 1 ? 'disabled' : '' ?>>↓</button>
+                </form>
+
+                <form method="post" class="inline" onsubmit="return confirm('Удалить этот вопрос? Отменить будет нельзя.')">
+                    <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                    <input type="hidden" name="action" value="faq-delete">
+                    <input type="hidden" name="id" value="<?= e($item['id']) ?>">
+                    <button class="tiny danger" type="submit">Удалить</button>
+                </form>
+            </div>
+        </div>
+    <?php endforeach; ?>
+
 <?php else: ?>
 
     <div class="bar">
@@ -375,11 +543,7 @@ $adding = $loggedIn && isset($_GET['add']);
             <h1>Команда</h1>
             <p class="sub" style="margin:0">Участников: <?= count($data['members']) ?>. Порядок в списке — порядок на сайте.</p>
         </div>
-        <div class="acts">
-            <a class="btn primary" href="?add=1">+ Добавить участника</a>
-            <a class="btn" href="../" target="_blank">Открыть сайт</a>
-            <a class="btn" href="?logout=1">Выйти</a>
-        </div>
+        <a class="btn primary" href="?add=1">+ Добавить участника</a>
     </div>
 
     <?php if (!$data['members']): ?>
@@ -431,6 +595,8 @@ $adding = $loggedIn && isset($_GET['add']);
         </div>
     <?php endforeach; ?>
 
+<?php endif; /* конец переключения вкладок */ ?>
+
     <div class="card" style="margin-top:32px">
         <h2>Сменить пароль</h2>
         <form method="post" class="narrow">
@@ -444,7 +610,7 @@ $adding = $loggedIn && isset($_GET['add']);
         </form>
     </div>
 
-<?php endif; ?>
+<?php endif; /* конец выбора экрана: установка, вход, форма, список */ ?>
 
 </div>
 </body>

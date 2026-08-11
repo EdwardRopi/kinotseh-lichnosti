@@ -2038,3 +2038,87 @@ main {
     letter-spacing: 0.04em;
     text-anchor: middle;
 }
+
+
+/* ================= ВОПРОСЫ РОДИТЕЛЕЙ =================
+   Раскрывающиеся блоки, как в карточках наставников, — язык уже
+   знаком по странице, нового учить не приходится.
+
+   Все ответы свёрнуты: развёрнутый список из шести абзацев отпугнёт
+   раньше, чем его начнут читать. Открывают то, что беспокоит. */
+
+.faq {
+    display: grid;
+    gap: 10px;
+    max-width: 860px;
+    margin-top: 38px;
+}
+
+.faq-item {
+    background: var(--bench);
+    border: 1px solid var(--rail);
+    clip-path: polygon(0 0, calc(100% - var(--notch)) 0, 100% var(--notch), 100% 100%, 0 100%);
+    transition: border-color var(--t);
+}
+.faq-item:hover { border-color: var(--rail-2); }
+.faq-item[open] { border-color: var(--rail-2); }
+
+.faq-item summary {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 19px 22px;
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--display);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    transition: color var(--t);
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary:hover { color: var(--lime); }
+
+/* Знак раскрытия: плюс превращается в минус поворотом одной черты */
+.faq-item summary::before {
+    content: '';
+    flex: none;
+    width: 15px;
+    height: 15px;
+    margin-top: 4px;
+    background:
+        linear-gradient(var(--lime), var(--lime)) center / 15px 1.5px no-repeat,
+        linear-gradient(var(--lime), var(--lime)) center / 1.5px 15px no-repeat;
+    transition: transform 0.3s var(--ease), opacity 0.3s var(--ease);
+}
+.faq-item[open] summary::before {
+    transform: rotate(90deg);
+    background:
+        linear-gradient(var(--lime), var(--lime)) center / 15px 1.5px no-repeat;
+}
+
+.faq-answer {
+    padding: 0 22px 20px 51px;
+    color: var(--dim);
+    font-size: 0.94rem;
+    animation: faq-open 0.32s var(--ease) both;
+}
+
+.faq-answer p + p { margin-top: 12px; }
+
+@keyframes faq-open {
+    from { opacity: 0; transform: translateY(-5px); }
+    to   { opacity: 1; transform: none; }
+}
+
+@media (max-width: 520px) {
+    .faq { gap: 8px; margin-top: 28px; }
+    .faq-item summary { padding: 16px 16px; gap: 11px; font-size: 0.94rem; }
+    .faq-answer { padding: 0 16px 17px 42px; font-size: 0.89rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .faq-answer { animation: none; }
+}

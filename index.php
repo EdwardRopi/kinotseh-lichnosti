@@ -2,7 +2,9 @@
 /* Страница собирается на сервере: секция наставников берётся из данных,
    которые редактируются в админке (/admin). Остальная вёрстка статична. */
 require __DIR__ . '/lib/team.php';
+require __DIR__ . '/lib/faq.php';
 $team = team_load();
+$faq  = faq_load();
 
 /* Сама страница не кэшируется: состав команды меняется из админки,
    и посетитель не должен видеть вчерашний список. */
@@ -343,6 +345,25 @@ function asset($path) {
         </section>
 
         <div class="perf" aria-hidden="true"></div>
+
+        <!-- ============ ВОПРОСЫ РОДИТЕЛЕЙ ============ -->
+        <!-- Стоит прямо перед формой: человек долистал сюда, значит
+             заинтересован, и между интересом и заявкой остались только
+             невысказанные сомнения. -->
+<?php if (faq_render($faq) !== ''): ?>
+        <section id="faq" class="band">
+            <div class="wrap">
+                <p class="kicker reveal">Прежде чем записаться</p>
+                <h2 class="band-title reveal t-wipe">Что спрашивают родители</h2>
+
+                <div class="faq">
+<?php echo faq_render($faq); ?>
+                </div>
+            </div>
+        </section>
+
+        <div class="perf" aria-hidden="true"></div>
+<?php endif; ?>
 
         <!-- ============ ЗАПИСЬ ============ -->
         <section id="application" class="band">
