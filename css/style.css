@@ -1699,15 +1699,23 @@ main {
     height: 78px;
 
     /* Полотно плюс два ряда перфорации по краям — та же геометрия,
-       что у разделителей секций, только крупнее и глуше */
-    background:
-        radial-gradient(circle at 50% 50%, rgba(12, 16, 12, 0.9) 0 3.4px, transparent 3.9px)
-            0 9px / 27px 20px repeat-x,
-        radial-gradient(circle at 50% 50%, rgba(12, 16, 12, 0.9) 0 3.4px, transparent 3.9px)
-            0 49px / 27px 20px repeat-x,
-        linear-gradient(rgba(42, 51, 39, 0.55), rgba(42, 51, 39, 0.55));
+       что у разделителей секций, только крупнее.
 
-    opacity: 0.5;
+       Отверстия непрозрачные, а не полупрозрачные: именно резкий край
+       дырки заставляет узнать плёнку. Размытая перфорация читается как
+       грязь на фоне, сколько её ни высветляй. */
+    background:
+        radial-gradient(circle at 50% 50%, var(--gate) 0 3.6px, transparent 4.1px)
+            0 9px / 27px 20px repeat-x,
+        radial-gradient(circle at 50% 50%, var(--gate) 0 3.6px, transparent 4.1px)
+            0 49px / 27px 20px repeat-x,
+        linear-gradient(var(--rail-2), var(--rail-2));
+
+    /* Кромки задают ленте край — без них полоса расплывается в фон */
+    border-top: 1px solid rgba(154, 166, 149, 0.22);
+    border-bottom: 1px solid rgba(154, 166, 149, 0.22);
+
+    opacity: 0.9;
     will-change: transform;
 }
 
@@ -1721,21 +1729,31 @@ main {
 
 .reels i:nth-child(2) {
     top: 47%;
-    opacity: 0.34;
+    opacity: 0.62;
     transform: rotate(calc(12deg - var(--reel-rot, 0deg))) translateX(var(--reel-2, 0px));
 }
 
 .reels i:nth-child(3) {
     top: 79%;
-    opacity: 0.22;
+    opacity: 0.45;
     transform: rotate(calc(-6deg + var(--reel-rot, 0deg))) translateX(var(--reel-3, 0px));
 }
 
+/* Средняя лента проходит через зону, где чаще всего лежит текст, —
+   притеняем её ровно там, чтобы она не спорила с чтением. Это дешевле
+   и честнее, чем глушить все ленты разом. */
+.reels::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(78% 46% at 50% 50%, rgba(12, 16, 12, 0.72), transparent 72%);
+}
+
 @media (max-width: 760px) {
-    /* На узком экране три ленты складываются в рябь: оставляем две
-       и делаем их тише — экран ближе к глазам, шум заметнее */
-    .reels i { height: 62px; opacity: 0.34; }
-    .reels i:nth-child(2) { opacity: 0.22; }
+    /* На узком экране три ленты складываются в рябь: оставляем две.
+       Контраст держим ниже настольного — экран ближе к глазам. */
+    .reels i { height: 62px; opacity: 0.62; }
+    .reels i:nth-child(2) { opacity: 0.42; }
     .reels i:nth-child(3) { display: none; }
 }
 
