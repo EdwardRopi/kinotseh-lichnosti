@@ -221,6 +221,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
     onScroll();
 
+    /* ---------------- Краевая маркировка плёнки ----------------
+       Строка, какую печатают вдоль края настоящей плёнки: марка,
+       тип эмульсии, номер кадра. Собираем в скрипте — в исходнике
+       страницы сотне повторяющихся кодов делать нечего.
+
+       Номера идут подряд и не повторяются на разных лентах: у каждой
+       свой отсчёт, как у разных бобин. */
+
+    document.querySelectorAll('.reels i').forEach((band, bandIndex) => {
+        const marks = [];
+        for (let n = 1; n <= 46; n++) {
+            const frame = String(n + bandIndex * 46).padStart(2, '0');
+            marks.push('КЦЛ 5219 ' + frame + 'A KRD');
+        }
+        const label = document.createElement('b');
+        label.textContent = marks.join('   ');
+        band.appendChild(label);
+    });
+
     /* ---------------- Появление блоков ---------------- */
 
     const revealItems = document.querySelectorAll('.reveal');
@@ -534,11 +553,41 @@ document.addEventListener('DOMContentLoaded', function () {
         const sent = await sendLead(data);
 
         if (sent.ok) {
-            say(sent.message || 'Заявка отправлена. Мы свяжемся с вами в течение дня.', 'ok');
+            /* Подтверждение подаём слейтом, а не строчкой: заявка ушла —
+               хлопушка захлопнулась, дубль принят. Тот же элемент, что
+               встречает на первом экране, закрывает историю в конце. */
+            if (formMsg) {
+                formMsg.className = 'form-msg ok slate-ok';
+                formMsg.innerHTML = '';
+
+                const clap = document.createElement('span');
+                clap.className = 'ok-clap';
+                clap.setAttribute('aria-hidden', 'true');
+
+                const head = document.createElement('span');
+                head.className = 'ok-head';
+                head.textContent = 'Дубль принят';
+
+                const text = document.createElement('span');
+                text.className = 'ok-text';
+                text.textContent = sent.message || 'Заявка отправлена. Мы свяжемся с вами в течение дня.';
+
+                formMsg.appendChild(clap);
+                formMsg.appendChild(head);
+                formMsg.appendChild(text);
+            }
+
             form.reset();
             clearBad();
             document.querySelectorAll('.tier.picked').forEach(el => el.classList.remove('picked'));
-            setTimeout(() => { formMsg.className = 'form-msg'; }, 6000);
+
+            /* Слейт висит дольше обычного сообщения: его читают,
+               а не просто замечают краем глаза. */
+            setTimeout(() => {
+                if (!formMsg) return;
+                formMsg.className = 'form-msg';
+                formMsg.textContent = '';
+            }, 9000);
         } else {
             say(sent.message || 'Не удалось отправить. Попробуйте позже или позвоните нам.', 'err');
         }
