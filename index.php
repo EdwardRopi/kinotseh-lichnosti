@@ -51,6 +51,32 @@ $team = team_load();
          Работают на чистом CSS, поэтому не могут «залипнуть» из-за скрипта. -->
     <div class="gate-in" aria-hidden="true"><i></i></div>
 
+    <!-- Приглашение на консультацию.
+         Разметка лежит в странице, но до открытия скрыта: так окно
+         появляется мгновенно, без подгрузки и рывка. -->
+    <div class="promo" id="promo" hidden>
+        <div class="promo-back" data-promo-close></div>
+
+        <div class="promo-card" role="dialog" aria-modal="true" aria-labelledby="promoTitle" aria-describedby="promoText">
+            <button type="button" class="promo-x" data-promo-close aria-label="Закрыть">&times;</button>
+
+            <p class="promo-kicker">Личная консультация</p>
+            <h2 class="promo-title" id="promoTitle">Успейте записаться</h2>
+            <p class="promo-text" id="promoText">
+                Разберём, какое направление подходит вашему ребёнку, и подберём группу.
+                Бесплатно, по телефону или в студии.
+            </p>
+
+            <div class="promo-timer">
+                <span class="promo-timer-label">Предложение действует</span>
+                <span class="promo-clock" id="promoClock" role="timer" aria-live="off">15:00</span>
+            </div>
+
+            <a href="#application" class="cta cta-block promo-go">Записаться на консультацию</a>
+            <button type="button" class="promo-later" data-promo-close>Не сейчас</button>
+        </div>
+    </div>
+
     <!-- Зерно киноплёнки поверх страницы -->
     <div class="grain" aria-hidden="true"></div>
 

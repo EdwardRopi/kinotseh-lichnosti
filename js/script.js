@@ -451,6 +451,112 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    /* ---------------- Приглашение на консультацию ----------------
+       Окно показывается с небольшой задержкой, а не мгновенно: окно,
+       перекрывающее контент сразу после захода, поисковики считают
+       навязчивым и понижают сайт в мобильной выдаче.
+
+       Отсчёт хранится в сессии браузера. Если сбрасывать его при каждом
+       обновлении страницы, «осталось 15 минут» превращается в очевидную
+       декорацию — а так предложение ведёт себя как настоящее. */
+
+    const promo = document.getElementById('promo');
+
+    if (promo) {
+        const SHOW_AFTER = 2500;          // мс до появления
+        const LIMIT_MIN  = 15;            // длительность предложения
+
+        const clock = document.getElementById('promoClock');
+        const card  = promo.querySelector('.promo-card');
+        let tick = null;
+        let lastFocus = null;
+
+        /* В приватном режиме обращение к хранилищу бросает исключение,
+           и без обёртки оно уронило бы весь скрипт страницы. */
+        function remember(key, value) {
+            try { sessionStorage.setItem(key, value); } catch (e) {}
+        }
+        function recall(key) {
+            try { return sessionStorage.getItem(key); } catch (e) { return null; }
+        }
+
+        function deadline() {
+            const saved = Number(recall('promo-end'));
+            if (saved && saved > Date.now()) return saved;
+            if (saved) return saved;                       // уже истёк — так и покажем
+            const end = Date.now() + LIMIT_MIN * 60000;
+            remember('promo-end', String(end));
+            return end;
+        }
+
+        function paint() {
+            const left = Math.max(0, deadline() - Date.now());
+            const total = Math.floor(left / 1000);
+            const mm = String(Math.floor(total / 60)).padStart(2, '0');
+            const ss = String(total % 60).padStart(2, '0');
+            if (clock) clock.textContent = mm + ':' + ss;
+
+            if (left <= 0) {
+                promo.classList.add('over');
+                if (clock) clock.textContent = '00:00';
+                clearInterval(tick);
+                tick = null;
+            }
+        }
+
+        function open() {
+            lastFocus = document.activeElement;
+            promo.hidden = false;
+            document.body.style.overflow = 'hidden';
+            paint();
+            if (!tick) tick = setInterval(paint, 1000);
+            promo.querySelector('.promo-x')?.focus();
+        }
+
+        function close() {
+            promo.hidden = true;
+            document.body.style.overflow = '';
+            clearInterval(tick);
+            tick = null;
+            remember('promo-off', '1');
+            if (lastFocus && lastFocus.focus) lastFocus.focus();
+        }
+
+        promo.querySelectorAll('[data-promo-close]').forEach(el => {
+            el.addEventListener('click', close);
+        });
+
+        /* Переход к форме — тоже закрытие: окно своё дело сделало */
+        promo.querySelector('.promo-go')?.addEventListener('click', close);
+
+        document.addEventListener('keydown', function (e) {
+            if (promo.hidden) return;
+
+            if (e.key === 'Escape') { close(); return; }
+
+            /* Пока окно открыто, Tab не должен уводить фокус на страницу
+               под ним: там пользователь его теряет и не может вернуться. */
+            if (e.key === 'Tab' && card) {
+                const items = card.querySelectorAll('button, a[href], input, select, textarea');
+                if (!items.length) return;
+                const first = items[0];
+                const last = items[items.length - 1];
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+        });
+
+        /* Не показываем тому, кто уже закрывал окно, и тому, кто пришёл
+           по ссылке прямо на форму: он и так знает, зачем пришёл. */
+        const skip = recall('promo-off') === '1' || location.hash === '#application';
+        if (!skip) setTimeout(open, SHOW_AFTER);
+    }
+
     /* ---------------- Актуальный год в футере ---------------- */
 
     const year = document.querySelector('.foot-bottom p');

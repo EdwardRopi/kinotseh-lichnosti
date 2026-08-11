@@ -1371,3 +1371,152 @@ main {
     .gate-in { display: none; }
     main, .header { animation: none; }
 }
+
+
+/* ============== ПРИГЛАШЕНИЕ НА КОНСУЛЬТАЦИЮ ==============
+   Окно поверх страницы. Держится в общем языке сайта: кадровое
+   окно со срезанным углом, лайм только на счётчике и кнопке.
+
+   На телефоне окно не растягивается на весь экран: перекрытый
+   целиком контент поисковики считают навязчивым и понижают сайт
+   в выдаче. Здесь под ним всегда видна страница. */
+
+.promo {
+    position: fixed;
+    inset: 0;
+    z-index: 9990;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+}
+
+.promo[hidden] { display: none; }
+
+.promo-back {
+    position: absolute;
+    inset: 0;
+    background: rgba(6, 9, 6, 0.72);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    animation: promo-fade 0.3s var(--ease) both;
+}
+
+.promo-card {
+    position: relative;
+    width: 100%;
+    max-width: 430px;
+    padding: 34px 30px 28px;
+    background: var(--bench);
+    border: 1px solid var(--rail);
+    clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 0 100%);
+    animation: promo-rise 0.42s var(--ease) 0.05s both;
+}
+
+@keyframes promo-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes promo-rise {
+    from { opacity: 0; transform: translateY(16px) scale(0.985); }
+    to   { opacity: 1; transform: none; }
+}
+
+.promo-x {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 26px;
+    line-height: 1;
+    color: var(--faint);
+    transition: color var(--t);
+}
+.promo-x:hover { color: var(--ink); }
+
+.promo-kicker {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--lime);
+    margin-bottom: 12px;
+}
+
+.promo-title {
+    font-size: clamp(1.5rem, 5.5vw, 1.95rem);
+    margin-bottom: 12px;
+}
+
+.promo-text {
+    color: var(--dim);
+    font-size: 0.94rem;
+    margin-bottom: 22px;
+}
+
+/* Счётчик — единственная «громкая» деталь окна, поэтому он один и крупный */
+.promo-timer {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    background: var(--panel);
+    border: 1px solid var(--rail);
+}
+
+.promo-timer-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--faint);
+}
+
+.promo-clock {
+    font-family: var(--mono);
+    font-size: 1.62rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--lime);
+    /* Цифры не должны прыгать по ширине при смене секунды */
+    font-variant-numeric: tabular-nums;
+}
+
+.promo.over .promo-clock { color: var(--faint); }
+
+.promo-go { margin-bottom: 10px; }
+
+.promo-later {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+    transition: color var(--t);
+}
+.promo-later:hover { color: var(--dim); }
+
+@media (max-width: 520px) {
+    .promo { padding: 16px; align-items: end; }
+    .promo-card { padding: 28px 20px 22px; }
+    .promo-timer { padding: 12px 14px; }
+    .promo-clock { font-size: 1.45rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .promo-back, .promo-card { animation: none; }
+}
