@@ -53,10 +53,13 @@ function asset($path) {
     <meta name="twitter:description" content="Киноцех личности — лаборатория развития ребенка через кино: актерское мастерство, режиссура, подкасты. Дети 8–17 лет.">
     <meta name="twitter:image" content="https://xn--d1ahfbogp.xn--p1ai/img/og-cover.png">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Onest:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Шрифты и иконки — свои. Ни одного обращения к чужим серверам:
+         раньше до первой отрисовки страница ждала Google Fonts и CDN
+         с иконками, а до зарубежных серверов из России достучаться
+         получается не всегда и не быстро. -->
+    <link rel="preload" href="fonts/Onest-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/Unbounded-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="<?= asset('css/fonts.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
 </head>
 <body>
@@ -247,7 +250,10 @@ function asset($path) {
                     <!-- АКТЕР -->
                     <article class="prog reveal">
                         <header class="prog-head">
-                            <span class="prog-icon" aria-hidden="true"><i class="fas fa-theater-masks"></i></span>
+                            <span class="prog-icon" aria-hidden="true">
+                                <!-- Маска: актёрское мастерство -->
+                                <svg class="ico" viewBox="0 0 24 24"><path d="M4 5h16v7a8 8 0 0 1-8 8 8 8 0 0 1-8-8z"/><path d="M8.5 10.5h2M13.5 10.5h2"/><path d="M9.5 15c1.5 1.2 3.5 1.2 5 0"/></svg>
+                            </span>
                             <h3>Актёр: суть</h3>
                         </header>
                         <p class="prog-desc">Развитие эмоционального интеллекта через актерское мастерство. Профориентация и формирование авторского взгляда.</p>
@@ -272,7 +278,10 @@ function asset($path) {
                     <!-- РЕЖИССЕР -->
                     <article class="prog reveal">
                         <header class="prog-head">
-                            <span class="prog-icon" aria-hidden="true"><i class="fas fa-video"></i></span>
+                            <span class="prog-icon" aria-hidden="true">
+                                <!-- Кинокамера: режиссура -->
+                                <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="9" width="12" height="10" rx="1"/><path d="M15 13.5 21 10v8l-6-3.5z"/><circle cx="7" cy="5.5" r="2.5"/><circle cx="13" cy="5.5" r="2.5"/></svg>
+                            </span>
                             <h3>Режиссёр: смыслы</h3>
                         </header>
                         <p class="prog-desc">Создание авторского кино от идеи до реализации. Развитие визуального мышления и режиссерских навыков.</p>
@@ -297,7 +306,10 @@ function asset($path) {
                     <!-- ПОДКАСТ -->
                     <article class="prog reveal">
                         <header class="prog-head">
-                            <span class="prog-icon" aria-hidden="true"><i class="fas fa-podcast"></i></span>
+                            <span class="prog-icon" aria-hidden="true">
+                                <!-- Микрофон: подкасты -->
+                                <svg class="ico" viewBox="0 0 24 24"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21M9 21h6"/></svg>
+                            </span>
                             <h3>Подкаст: голос и влияние</h3>
                         </header>
                         <p class="prog-desc">Освоение полного цикла создания подкастов. Развитие уверенной речи и цифровой грамотности.</p>
@@ -420,10 +432,18 @@ function asset($path) {
                             <div><dt>Email</dt><dd><a href="mailto:k.plokhotnikov@yandex.ru">k.plokhotnikov@yandex.ru</a></dd></div>
                         </dl>
                         <div class="socials">
-                            <a href="#" aria-label="ВКонтакте"><i class="fab fa-vk" aria-hidden="true"></i></a>
-                            <a href="#" aria-label="Telegram"><i class="fab fa-telegram" aria-hidden="true"></i></a>
-                            <a href="#" aria-label="YouTube"><i class="fab fa-youtube" aria-hidden="true"></i></a>
-                            <a href="#" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                            <a href="#" aria-label="ВКонтакте">
+                                <svg class="ico" viewBox="0 0 24 24"><rect x="2.5" y="2.5" width="19" height="19" rx="4"/><text x="12" y="15.4" class="ico-txt">VK</text></svg>
+                            </a>
+                            <a href="#" aria-label="Telegram">
+                                <svg class="ico" viewBox="0 0 24 24"><path d="M21 4 3 11l5 1.8L19 6.5l-8.2 8v4.2l2.8-3.2 4.6 3.3z"/></svg>
+                            </a>
+                            <a href="#" aria-label="YouTube">
+                                <svg class="ico" viewBox="0 0 24 24"><rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="M10.2 9.4 15 12l-4.8 2.6z"/></svg>
+                            </a>
+                            <a href="#" aria-label="Instagram">
+                                <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" class="ico-dot"/></svg>
+                            </a>
                         </div>
                     </div>
 
