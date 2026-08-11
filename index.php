@@ -290,7 +290,7 @@ $team = team_load();
                         <p class="book-note">Оставьте заявку, и мы свяжемся с вами в течение дня для уточнения деталей и подбора подходящей программы для вашего ребенка.</p>
                         <ul class="book-contacts">
                             <li><span>Телефон</span><a href="tel:+79181205573">+7 (918) 120-55-73</a></li>
-                            <li><span>Почта</span><a href="mailto:info@kinoceh.ru">info@kinoceh.ru</a></li>
+                            <li><span>Почта</span><a href="mailto:k.plokhotnikov@yandex.ru">k.plokhotnikov@yandex.ru</a></li>
                             <li><span>Адрес</span><p>г. Краснодар, ул. Северная, 405</p></li>
                         </ul>
                     </aside>
@@ -364,7 +364,7 @@ $team = team_load();
                             <div><dt>Адрес</dt><dd>г. Краснодар, ул. Северная, 405</dd></div>
                             <div><dt>Часы работы</dt><dd>Пн-Пт: 10:00-20:00, Сб-Вс: 10:00-18:00</dd></div>
                             <div><dt>Телефон</dt><dd><a href="tel:+79181205573">+7 (918) 120-55-73</a></dd></div>
-                            <div><dt>Email</dt><dd><a href="mailto:info@kinoceh.ru">info@kinoceh.ru</a></dd></div>
+                            <div><dt>Email</dt><dd><a href="mailto:k.plokhotnikov@yandex.ru">k.plokhotnikov@yandex.ru</a></dd></div>
                         </dl>
                         <div class="socials">
                             <a href="#" aria-label="ВКонтакте"><i class="fab fa-vk" aria-hidden="true"></i></a>
@@ -379,7 +379,6 @@ $team = team_load();
                             src="https://yandex.ru/map-widget/v1/?ll=38.995723%2C45.037458&z=16&pt=38.995723%2C45.037458%2Cpm2orgl&l=map"
                             width="100%" height="420" frameborder="0" allowfullscreen="true" loading="lazy"
                             title="Карта проезда к Киноцех личности"></iframe>
-                        <button type="button" class="map-veil">Нажмите, чтобы включить карту</button>
                     </div>
                 </div>
             </div>
@@ -403,7 +402,7 @@ $team = team_load();
             <div class="foot-contact">
                 <h4>Свяжитесь с нами</h4>
                 <a href="tel:+79181205573">+7 (918) 120-55-73</a>
-                <a href="mailto:info@kinoceh.ru">info@kinoceh.ru</a>
+                <a href="mailto:k.plokhotnikov@yandex.ru">k.plokhotnikov@yandex.ru</a>
             </div>
         </div>
         <div class="wrap foot-bottom">

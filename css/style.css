@@ -859,42 +859,6 @@ button { font: inherit; color: inherit; }
     overflow: hidden;
 }
 
-/* Пока карта не включена, она не перехватывает прокрутку страницы —
-   на телефоне это иначе превращается в ловушку для пальца */
-.map-veil {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    width: 100%;
-    display: grid;
-    place-content: center;
-    padding: 16px;
-    background: rgba(12, 16, 12, 0.55);
-    border: none;
-    cursor: pointer;
-    font-family: var(--mono);
-    font-size: 0.74rem;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    line-height: 1.5;
-    color: var(--ink);
-    text-align: center;
-    transition: opacity 0.35s var(--ease), visibility 0.35s var(--ease), background 0.25s var(--ease);
-}
-.map-veil:hover { background: rgba(12, 16, 12, 0.4); }
-.map-veil::before {
-    content: '';
-    display: block;
-    width: 34px; height: 34px;
-    margin: 0 auto 12px;
-    border: 1px solid var(--lime);
-    border-radius: 50%;
-    background:
-        linear-gradient(var(--lime), var(--lime)) center / 2px 12px no-repeat,
-        linear-gradient(var(--lime), var(--lime)) center / 12px 2px no-repeat;
-}
-.map.live .map-veil { opacity: 0; visibility: hidden; }
 .map iframe {
     display: block;
     width: 100%;
@@ -903,7 +867,13 @@ button { font: inherit; color: inherit; }
     /* Карта приведена к гамме сайта */
     filter: invert(0.91) hue-rotate(65deg) saturate(0.55) contrast(0.92) brightness(0.98);
     transition: filter 0.5s var(--ease);
+
+    /* Карта видна сразу, но пока не «схвачена» — сквозная для касаний.
+       Иначе палец над ней листает карту вместо страницы, а колесо мыши
+       застревает посреди прокрутки. Первое нажатие включает управление. */
+    pointer-events: none;
 }
+.map.live iframe { pointer-events: auto; }
 .map:hover iframe { filter: invert(0.89) hue-rotate(65deg) saturate(0.8) contrast(0.98) brightness(1); }
 
 /* =========================== ФУТЕР =========================== */

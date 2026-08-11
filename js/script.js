@@ -211,11 +211,15 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    /* ---------------- Карта включается по нажатию ---------------- */
-    /* Иначе на телефоне палец над картой листает карту, а не страницу. */
+    /* ---------------- Карта ----------------
+       Карта видна сразу, без заглушки. Но до первого нажатия она не
+       принимает касания: иначе палец над ней листает карту вместо
+       страницы, а колесо мыши застревает посреди прокрутки.
+       Одно нажатие — и карта становится обычной, с перетаскиванием
+       и масштабом. */
 
     const mapBox = document.querySelector('.map');
-    mapBox?.querySelector('.map-veil')?.addEventListener('click', function () {
+    mapBox?.addEventListener('click', function () {
         mapBox.classList.add('live');
     });
 
