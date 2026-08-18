@@ -3,8 +3,10 @@
    которые редактируются в админке (/admin). Остальная вёрстка статична. */
 require __DIR__ . '/lib/team.php';
 require __DIR__ . '/lib/faq.php';
-$team = team_load();
-$faq  = faq_load();
+require __DIR__ . '/lib/programs.php';
+$team     = team_load();
+$faq      = faq_load();
+$programs = programs_load();
 
 /* Сама страница не кэшируется: состав команды меняется из админки,
    и посетитель не должен видеть вчерашний список. */
@@ -249,83 +251,7 @@ function asset($path) {
                 </div>
 
                 <div class="progs">
-                    <!-- АКТЕР -->
-                    <article class="prog reveal">
-                        <header class="prog-head">
-                            <span class="prog-icon" aria-hidden="true">
-                                <!-- Маска: актёрское мастерство -->
-                                <svg class="ico" viewBox="0 0 24 24"><path d="M4 5h16v7a8 8 0 0 1-8 8 8 8 0 0 1-8-8z"/><path d="M8.5 10.5h2M13.5 10.5h2"/><path d="M9.5 15c1.5 1.2 3.5 1.2 5 0"/></svg>
-                            </span>
-                            <h3>Актёр: суть</h3>
-                        </header>
-                        <p class="prog-desc">Развитие эмоционального интеллекта через актерское мастерство. Профориентация и формирование авторского взгляда.</p>
-
-                        <div class="tiers">
-                            <button type="button" class="tier show" data-program="actor-base" data-tier="base">
-                                <span class="tier-price">10 000 <i>₽/мес</i></span>
-                                <span class="tier-meta">2 месяца · группы 8–12 чел.</span>
-                                <span class="tier-desc">Развитие эмоционального интеллекта. Итог — Проф ориентация и авторский взгляд.</span>
-                                <span class="tier-go">Выбрать</span>
-                            </button>
-
-                            <button type="button" class="tier" data-program="actor-pro" data-tier="pro">
-                                <span class="tier-price">14 000 <i>₽/мес</i></span>
-                                <span class="tier-meta">5 месяцев · группы 8–10 чел.</span>
-                                <span class="tier-desc">Развитие эмоционального интеллекта. Итог — Профориентация и авторский взгляд. Итог — моноспектакль.</span>
-                                <span class="tier-go">Выбрать</span>
-                            </button>
-                        </div>
-                    </article>
-
-                    <!-- РЕЖИССЕР -->
-                    <article class="prog reveal">
-                        <header class="prog-head">
-                            <span class="prog-icon" aria-hidden="true">
-                                <!-- Кинокамера: режиссура -->
-                                <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="9" width="12" height="10" rx="1"/><path d="M15 13.5 21 10v8l-6-3.5z"/><circle cx="7" cy="5.5" r="2.5"/><circle cx="13" cy="5.5" r="2.5"/></svg>
-                            </span>
-                            <h3>Режиссёр: смыслы</h3>
-                        </header>
-                        <p class="prog-desc">Создание авторского кино от идеи до реализации. Развитие визуального мышления и режиссерских навыков.</p>
-
-                        <div class="tiers">
-                            <button type="button" class="tier show" data-program="director-base" data-tier="base">
-                                <span class="tier-price">11 000 <i>₽/мес</i></span>
-                                <span class="tier-meta">4 месяца</span>
-                                <span class="tier-desc">Киноязык и блогерство через игру. Режиссеры снимают наших актёров.</span>
-                                <span class="tier-go">Выбрать</span>
-                            </button>
-
-                            <button type="button" class="tier" data-program="director-pro" data-tier="pro">
-                                <span class="tier-price">12 000 <i>₽/мес</i></span>
-                                <span class="tier-meta">6 месяцев</span>
-                                <span class="tier-desc">Сложные навыки и монтаж. Подготовка портфолио для вуза или карьеры.</span>
-                                <span class="tier-go">Выбрать</span>
-                            </button>
-                        </div>
-                    </article>
-
-                    <!-- ПОДКАСТ -->
-                    <article class="prog reveal">
-                        <header class="prog-head">
-                            <span class="prog-icon" aria-hidden="true">
-                                <!-- Микрофон: подкасты -->
-                                <svg class="ico" viewBox="0 0 24 24"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21M9 21h6"/></svg>
-                            </span>
-                            <h3>Подкаст: голос и влияние</h3>
-                        </header>
-                        <p class="prog-desc">Освоение полного цикла создания подкастов. Развитие уверенной речи и цифровой грамотности.</p>
-
-                        <div class="tiers">
-                            <!-- Курс единый для 8–15 лет, поэтому виден при любом переключателе -->
-                            <button type="button" class="tier show" data-program="podcast" data-tier="both">
-                                <span class="tier-price">7 000 <i>₽/мес — 14 000 ₽ за курс</i></span>
-                                <span class="tier-meta">Полный курс · 8–15 лет</span>
-                                <span class="tier-desc">Освоение полного цикла: от идеи до публикации. Развитие уверенной речи и цифровой грамотности.</span>
-                                <span class="tier-go">Выбрать</span>
-                            </button>
-                        </div>
-                    </article>
+<?php echo programs_render($programs); ?>
                 </div>
             </div>
         </section>
@@ -406,11 +332,7 @@ function asset($path) {
                             <label for="program">Программа</label>
                             <select id="program" name="program" required>
                                 <option value="">Выберите программу</option>
-                                <option value="actor-base">Актер: суть (8-12 лет, База)</option>
-                                <option value="actor-pro">Актер: суть (13-17 лет, Про)</option>
-                                <option value="director-base">Режиссер: смыслы (8-12 лет, База)</option>
-                                <option value="director-pro">Режиссер: смыслы (13-17 лет, Про)</option>
-                                <option value="podcast">Подкаст: голос и влияние (8-15 лет)</option>
+<?php echo programs_options($programs); ?>
                             </select>
                         </p>
                         <p class="field">

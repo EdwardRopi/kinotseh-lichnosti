@@ -12,6 +12,7 @@
 
 require dirname(__DIR__) . '/lib/team.php';
 require dirname(__DIR__) . '/lib/faq.php';
+require dirname(__DIR__) . '/lib/programs.php';
 
 define('ADMIN_FILE', dirname(dirname(__DIR__)) . '/kinokrd-admin.json');
 define('MAX_PHOTO',  5 * 1024 * 1024);
@@ -169,6 +170,116 @@ if ($loggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']
         redirect('ok=' . rawurlencode('Порядок изменён'));
     }
 
+    /* ---------- программы обучения ---------- */
+
+    if ($action === 'prog-save') {
+        $progs = programs_load();
+        $id    = isset($_POST['id']) ? trim($_POST['id']) : '';
+        $title = trim(isset($_POST['title']) ? $_POST['title'] : '');
+
+        if ($title === '') {
+            $error = 'Название программы обязательно.';
+        } else {
+            $idx = $id !== '' ? programs_find($progs, $id) : null;
+            $p   = $idx !== null ? $progs['programs'][$idx] : array('tiers' => array());
+
+            $p['title']   = $title;
+            $p['desc']    = trim(isset($_POST['desc']) ? $_POST['desc'] : '');
+            $p['icon']    = isset($_POST['icon']) ? $_POST['icon'] : 'star';
+            $p['visible'] = !empty($_POST['visible']);
+
+            if ($idx !== null) {
+                $progs['programs'][$idx] = $p;
+                $msg = 'Программа сохранена';
+            } else {
+                /* Идентификатор задаём сами и больше не меняем: на него
+                   ссылаются уже отправленные заявки. */
+                $p['id'] = 'prog' . time();
+                $progs['programs'][] = $p;
+                $msg = 'Программа добавлена';
+            }
+            programs_save($progs);
+            redirect('tab=prog&ok=' . rawurlencode($msg));
+        }
+    }
+
+    if ($action === 'prog-delete') {
+        $progs = programs_load();
+        $idx = programs_find($progs, isset($_POST['id']) ? $_POST['id'] : '');
+        if ($idx !== null) {
+            array_splice($progs['programs'], $idx, 1);
+            programs_save($progs);
+        }
+        redirect('tab=prog&ok=' . rawurlencode('Программа удалена'));
+    }
+
+    if ($action === 'prog-move') {
+        $progs = programs_load();
+        $idx = programs_find($progs, isset($_POST['id']) ? $_POST['id'] : '');
+        $dir = ($_POST['dir'] === 'up') ? -1 : 1;
+        $new = $idx + $dir;
+        if ($idx !== null && $new >= 0 && $new < count($progs['programs'])) {
+            $tmp = $progs['programs'][$idx];
+            $progs['programs'][$idx] = $progs['programs'][$new];
+            $progs['programs'][$new] = $tmp;
+            programs_save($progs);
+        }
+        redirect('tab=prog&ok=' . rawurlencode('Порядок изменён'));
+    }
+
+    if ($action === 'tier-save') {
+        $progs  = programs_load();
+        $tierId = isset($_POST['id']) ? trim($_POST['id']) : '';
+        $progId = isset($_POST['program']) ? trim($_POST['program']) : '';
+        $price  = trim(isset($_POST['price']) ? $_POST['price'] : '');
+
+        if ($price === '') {
+            $error = 'Цена обязательна.';
+        } else {
+            $found = $tierId !== '' ? programs_find_tier($progs, $tierId) : null;
+
+            if ($found !== null) {
+                list($pi, $ti) = $found;
+                $t = $progs['programs'][$pi]['tiers'][$ti];
+            } else {
+                $pi = programs_find($progs, $progId);
+                if ($pi === null) { redirect('tab=prog&ok=' . rawurlencode('Программа не найдена')); }
+                $ti = null;
+                $t  = array('id' => 'tier' . time());
+            }
+
+            $t['price'] = $price;
+            $t['unit']  = trim(isset($_POST['unit'])  ? $_POST['unit']  : '');
+            $t['meta']  = trim(isset($_POST['meta'])  ? $_POST['meta']  : '');
+            $t['desc']  = trim(isset($_POST['desc'])  ? $_POST['desc']  : '');
+            $t['label'] = trim(isset($_POST['label']) ? $_POST['label'] : '');
+            $t['tier']  = isset($_POST['tier']) ? $_POST['tier'] : 'both';
+
+            if ($t['label'] === '') { $t['label'] = $progs['programs'][$pi]['title']; }
+
+            if ($ti !== null) {
+                $progs['programs'][$pi]['tiers'][$ti] = $t;
+                $msg = 'Уровень сохранён';
+            } else {
+                $progs['programs'][$pi]['tiers'][] = $t;
+                $msg = 'Уровень добавлен';
+            }
+            programs_save($progs);
+            redirect('tab=prog&ok=' . rawurlencode($msg));
+        }
+    }
+
+    if ($action === 'tier-delete') {
+        $progs = programs_load();
+        $found = programs_find_tier($progs, isset($_POST['id']) ? $_POST['id'] : '');
+        if ($found !== null) {
+            list($pi, $ti) = $found;
+            array_splice($progs['programs'][$pi]['tiers'], $ti, 1);
+            programs_save($progs);
+        }
+        redirect('tab=prog&ok=' . rawurlencode('Уровень удалён'));
+    }
+
     /* ---------- вопросы родителей ---------- */
 
     if ($action === 'faq-save') {
@@ -272,7 +383,12 @@ function upload_photo($file) {
 
 $data    = team_load();
 $faq     = faq_load();
-$tab     = (isset($_GET['tab']) && $_GET['tab'] === 'faq') ? 'faq' : 'team';
+$progs   = programs_load();
+
+$tab = 'team';
+if (isset($_GET['tab']) && in_array($_GET['tab'], array('faq', 'prog'), true)) {
+    $tab = $_GET['tab'];
+}
 
 $editId  = isset($_GET['edit']) ? $_GET['edit'] : null;
 $editing = null;
@@ -289,6 +405,31 @@ if ($loggedIn && $faqEditId !== null) {
     $faqEditing = $i !== null ? $faq['items'][$i] : null;
 }
 $faqAdding = $loggedIn && isset($_GET['faqadd']);
+
+$progEditing = null;
+if ($loggedIn && isset($_GET['progedit'])) {
+    $i = programs_find($progs, $_GET['progedit']);
+    $progEditing = $i !== null ? $progs['programs'][$i] : null;
+}
+$progAdding = $loggedIn && isset($_GET['progadd']);
+
+/* Уровень правится в паре со своей программой: без неё непонятно,
+   куда возвращать новый и чьё название подставлять по умолчанию. */
+$tierEditing = null;
+$tierParent  = null;
+if ($loggedIn && isset($_GET['tieredit'])) {
+    $found = programs_find_tier($progs, $_GET['tieredit']);
+    if ($found !== null) {
+        list($pi, $ti) = $found;
+        $tierEditing = $progs['programs'][$pi]['tiers'][$ti];
+        $tierParent  = $progs['programs'][$pi];
+    }
+}
+$tierAdding = null;
+if ($loggedIn && isset($_GET['tieradd'])) {
+    $i = programs_find($progs, $_GET['tieradd']);
+    $tierAdding = $i !== null ? $progs['programs'][$i] : null;
+}
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -441,6 +582,101 @@ $faqAdding = $loggedIn && isset($_GET['faqadd']);
         <p style="margin-top:24px"><button class="primary" type="submit">Сохранить</button></p>
     </form>
 
+<?php elseif ($progEditing !== null || $progAdding): ?>
+
+    <?php $pr = $progEditing !== null ? $progEditing : array('id'=>'','title'=>'','desc'=>'','icon'=>'star','visible'=>true); ?>
+
+    <div class="bar">
+        <h1><?= $progEditing !== null ? 'Программа' : 'Новая программа' ?></h1>
+        <a class="btn" href="?tab=prog">← К списку</a>
+    </div>
+
+    <form method="post" class="card">
+        <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+        <input type="hidden" name="action" value="prog-save">
+        <input type="hidden" name="id" value="<?= e($pr['id']) ?>">
+
+        <label>Название направления</label>
+        <input type="text" name="title" value="<?= e($pr['title']) ?>" required autofocus>
+
+        <label>Описание под названием
+            <span class="hint">Одна-две фразы о сути направления. Показывается над ценами.</span>
+        </label>
+        <textarea name="desc" style="min-height:90px"><?= e($pr['desc']) ?></textarea>
+
+        <label>Значок</label>
+        <select name="icon" style="width:100%;padding:10px 12px;background:var(--panel);color:var(--ink);border:1px solid var(--rail);border-radius:2px;font:inherit">
+            <?php foreach (programs_icons() as $key => $ic): ?>
+                <option value="<?= e($key) ?>" <?= (isset($pr['icon']) && $pr['icon'] === $key) ? 'selected' : '' ?>><?= e($ic['name']) ?></option>
+            <?php endforeach; ?>
+        </select>
+
+        <label style="display:flex;align-items:center;gap:8px;margin-top:22px">
+            <input type="checkbox" name="visible" value="1" <?= !empty($pr['visible']) ? 'checked' : '' ?> style="width:auto">
+            Показывать на сайте
+        </label>
+
+        <p style="margin-top:24px"><button class="primary" type="submit">Сохранить</button></p>
+    </form>
+
+<?php elseif ($tierEditing !== null || $tierAdding !== null): ?>
+
+    <?php
+        $tr     = $tierEditing !== null ? $tierEditing : array('id'=>'','price'=>'','unit'=>'₽/мес','meta'=>'','desc'=>'','label'=>'','tier'=>'both');
+        $parent = $tierEditing !== null ? $tierParent : $tierAdding;
+    ?>
+
+    <div class="bar">
+        <h1><?= $tierEditing !== null ? 'Цена и наполнение' : 'Новый уровень' ?></h1>
+        <a class="btn" href="?tab=prog">← К списку</a>
+    </div>
+
+    <p class="sub">Направление: <?= e($parent['title']) ?></p>
+
+    <form method="post" class="card">
+        <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+        <input type="hidden" name="action" value="tier-save">
+        <input type="hidden" name="id" value="<?= e($tr['id']) ?>">
+        <input type="hidden" name="program" value="<?= e($parent['id']) ?>">
+
+        <label>Цена
+            <span class="hint">Только число, например 10 000. Единицы — в поле ниже.</span>
+        </label>
+        <input type="text" name="price" value="<?= e($tr['price']) ?>" required autofocus>
+
+        <label>Единицы после цены
+            <span class="hint">Например «₽/мес» или «₽/мес — 14 000 ₽ за курс». Показывается мелким шрифтом под ценой.</span>
+        </label>
+        <input type="text" name="unit" value="<?= e($tr['unit']) ?>">
+
+        <label>Строка условий
+            <span class="hint">Длительность и размер группы: «2 месяца · группы 8–12 чел.»</span>
+        </label>
+        <input type="text" name="meta" value="<?= e($tr['meta']) ?>">
+
+        <label>Наполнение
+            <span class="hint">Текст под ценой: что входит и чем заканчивается курс.</span>
+        </label>
+        <textarea name="desc" style="min-height:110px"><?= e($tr['desc']) ?></textarea>
+
+        <label>Название в форме записи
+            <span class="hint">Как этот уровень называется в выпадающем списке и в письме с заявкой.
+            Например «Актёр: суть (8–12 лет, База)».</span>
+        </label>
+        <input type="text" name="label" value="<?= e($tr['label']) ?>">
+
+        <label>Возрастная группа
+            <span class="hint">Определяет, при каком положении переключателя на сайте виден этот уровень.</span>
+        </label>
+        <select name="tier" style="width:100%;padding:10px 12px;background:var(--panel);color:var(--ink);border:1px solid var(--rail);border-radius:2px;font:inherit">
+            <option value="base" <?= $tr['tier'] === 'base' ? 'selected' : '' ?>>База — 8–12 лет</option>
+            <option value="pro"  <?= $tr['tier'] === 'pro'  ? 'selected' : '' ?>>Про — 13–17 лет</option>
+            <option value="both" <?= $tr['tier'] === 'both' ? 'selected' : '' ?>>Виден всегда</option>
+        </select>
+
+        <p style="margin-top:24px"><button class="primary" type="submit">Сохранить</button></p>
+    </form>
+
 <?php elseif ($faqEditing !== null || $faqAdding): ?>
 
     <?php $q = $faqEditing !== null ? $faqEditing : array('id'=>'','q'=>'','a'=>'','visible'=>true); ?>
@@ -479,6 +715,7 @@ $faqAdding = $loggedIn && isset($_GET['faqadd']);
     <div class="bar">
         <div class="tabs">
             <a class="tab <?= $tab === 'team' ? 'on' : '' ?>" href="?">Команда</a>
+            <a class="tab <?= $tab === 'prog' ? 'on' : '' ?>" href="?tab=prog">Программы</a>
             <a class="tab <?= $tab === 'faq'  ? 'on' : '' ?>" href="?tab=faq">Вопросы родителей</a>
         </div>
         <div class="acts">
@@ -487,7 +724,83 @@ $faqAdding = $loggedIn && isset($_GET['faqadd']);
         </div>
     </div>
 
-<?php if ($tab === 'faq'): ?>
+<?php if ($tab === 'prog'): ?>
+
+    <div class="bar">
+        <div>
+            <h1>Программы обучения</h1>
+            <p class="sub" style="margin:0">Цены и наполнение меняются здесь. Они же подставляются в форму записи и в письмо с заявкой.</p>
+        </div>
+        <a class="btn primary" href="?progadd=1">+ Добавить направление</a>
+    </div>
+
+    <?php if (!$progs['programs']): ?>
+        <div class="card"><p style="margin:0;color:var(--dim)">Пока пусто. Нажмите «Добавить направление».</p></div>
+    <?php endif; ?>
+
+    <?php foreach ($progs['programs'] as $i => $pr): ?>
+        <div class="card">
+            <div class="name">
+                <?= e($pr['title']) ?>
+                <?php if (empty($pr['visible'])): ?><span class="hidden-tag">· скрыто</span><?php endif; ?>
+            </div>
+            <div class="role"><?= e(mb_substr(preg_replace('/\s+/u', ' ', isset($pr['desc']) ? $pr['desc'] : ''), 0, 140)) ?></div>
+
+            <div class="acts" style="margin-top:12px">
+                <a class="btn tiny" href="?progedit=<?= e($pr['id']) ?>">Название и описание</a>
+
+                <form method="post" class="inline">
+                    <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                    <input type="hidden" name="action" value="prog-move">
+                    <input type="hidden" name="id" value="<?= e($pr['id']) ?>">
+                    <button class="tiny" name="dir" value="up" <?= $i === 0 ? 'disabled' : '' ?>>↑</button>
+                </form>
+
+                <form method="post" class="inline">
+                    <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                    <input type="hidden" name="action" value="prog-move">
+                    <input type="hidden" name="id" value="<?= e($pr['id']) ?>">
+                    <button class="tiny" name="dir" value="down" <?= $i === count($progs['programs']) - 1 ? 'disabled' : '' ?>>↓</button>
+                </form>
+
+                <form method="post" class="inline" onsubmit="return confirm('Удалить направление «<?= e($pr['title']) ?>» вместе со всеми ценами?')">
+                    <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                    <input type="hidden" name="action" value="prog-delete">
+                    <input type="hidden" name="id" value="<?= e($pr['id']) ?>">
+                    <button class="tiny danger" type="submit">Удалить</button>
+                </form>
+            </div>
+
+            <!-- Уровни направления: именно здесь живут цена и наполнение -->
+            <div style="margin-top:16px;border-top:1px solid var(--rail);padding-top:14px">
+                <?php foreach ((isset($pr['tiers']) ? $pr['tiers'] : array()) as $tr): ?>
+                    <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;padding:9px 0;border-bottom:1px solid var(--rail)">
+                        <span style="font-family:monospace;font-size:17px;color:var(--lime);font-weight:600;min-width:96px">
+                            <?= e($tr['price']) ?>
+                        </span>
+                        <span style="color:var(--dim);font-size:13px;flex:1;min-width:180px">
+                            <?= e($tr['meta']) ?>
+                        </span>
+                        <span class="acts">
+                            <a class="btn tiny" href="?tieredit=<?= e($tr['id']) ?>">Цена и наполнение</a>
+                            <form method="post" class="inline" onsubmit="return confirm('Удалить этот уровень?')">
+                                <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                                <input type="hidden" name="action" value="tier-delete">
+                                <input type="hidden" name="id" value="<?= e($tr['id']) ?>">
+                                <button class="tiny danger" type="submit">×</button>
+                            </form>
+                        </span>
+                    </div>
+                <?php endforeach; ?>
+
+                <p style="margin-top:12px">
+                    <a class="btn tiny" href="?tieradd=<?= e($pr['id']) ?>">+ Добавить уровень</a>
+                </p>
+            </div>
+        </div>
+    <?php endforeach; ?>
+
+<?php elseif ($tab === 'faq'): ?>
 
     <div class="bar">
         <div>
